@@ -15,9 +15,22 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Label Grid.Column="0" HorizontalAlignment="Right" Padding="5" VerticalAlignment="Top" VerticalContentAlignment="Center"
-               Content="{Binding Label, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:LabelTextboxUserControl}}}" />
-        <TextBox Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="0,5,5,0"
+        <Label Grid.Column="0" HorizontalAlignment="Right" Padding="0" Grid.RowSpan="2"
+               Content="{Binding Label, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:LabelTextboxUserControl}}}" >
+            <Label.Style>
+                <Style TargetType="{x:Type Label}">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMultiline, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:LabelTextboxUserControl}}}" Value="True">
+                            <Setter Property="VerticalAlignment" Value="Top"/>
+                            <Setter Property="Margin" Value="0,2.5,0,0"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Label.Style>
+        </Label>
+        <TextBox Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="5,2.5,5,2.5"
                  Text="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:LabelTextboxUserControl}}}" 
                  IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:LabelTextboxUserControl}}}" 
                  AcceptsReturn="{Binding IsMultiline, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:LabelTextboxUserControl}}}">
@@ -27,6 +40,8 @@
                     <Style.Triggers>
                         <Trigger Property="AcceptsReturn" Value="True">
                             <Setter Property="VerticalAlignment" Value="Stretch"/>
+                            <Setter Property="VerticalScrollBarVisibility" Value="Visible"/>
+                            <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
                         </Trigger>
                     </Style.Triggers>
                 </Style>

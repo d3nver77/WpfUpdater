@@ -1,9 +1,22 @@
-﻿using UpdateCreator.ViewModels.Commands;
+﻿using System.Collections.ObjectModel;
+using UpdateCreator.ViewModels.Commands;
 
 namespace UpdateCreator.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
+        public MainViewModel()
+        {
+            this.FileList = new ObservableCollection<CheckedFile>();
+            FileList.Add(new CheckedFile() { Filename = "file1.txt", IsSelected = true});
+            FileList.Add(new CheckedFile() { Filename = "file2.txt", IsSelected = true});
+            FileList.Add(new CheckedFile() { Filename = "file3.txt", IsSelected = false});
+            FileList.Add(new CheckedFile() { Filename = "file4.txt", IsSelected = true});
+            FileList.Add(new CheckedFile() { Filename = "file5.txt", IsSelected = false});
+        }
+
+        public ObservableCollection<CheckedFile> FileList { get; private set; }
+
 
         private CommandViewModel _createUpdatePackageCommand = null;
         public CommandViewModel CreateUpdatePackageCommand
@@ -45,10 +58,6 @@ namespace UpdateCreator.ViewModels
         private void Close(object obj)
         {
             throw new System.NotImplementedException();
-        }
-
-        public MainViewModel()
-        {
         }
     }
 }

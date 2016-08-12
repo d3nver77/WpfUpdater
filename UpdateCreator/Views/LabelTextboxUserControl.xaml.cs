@@ -37,7 +37,6 @@ namespace UpdateCreator.Views
 
         public static readonly DependencyProperty IsMultilineProperty = DependencyProperty.Register(
             "IsMultiline", typeof(bool), typeof(LabelTextboxUserControl), new PropertyMetadata(default(bool)));
-
         public bool IsMultiline
         {
             get { return (bool) this.GetValue(IsMultilineProperty); }
@@ -48,14 +47,8 @@ namespace UpdateCreator.Views
 
         public LabelTextboxUserControl()
         {
-            if (DesignerProperties.GetIsInDesignMode(this))
-            {
-                this.Label = "Design Label Text";
-                this.Text = "Design Text";
-            }
-
             InitializeComponent();
-            
+
         }
     }
 }

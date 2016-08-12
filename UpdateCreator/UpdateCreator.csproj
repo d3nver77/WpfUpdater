@@ -78,12 +78,19 @@
     </ApplicationDefinition>
     <Compile Include="Models\Generator.cs" />
     <Compile Include="Models\UpdateXml.cs" />
+    <Compile Include="ViewModels\CheckedFile.cs" />
     <Compile Include="ViewModels\Commands\RelayCommand.cs" />
     <Compile Include="ViewModels\CommandViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ServiceLocator.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
+    <Compile Include="Views\FileListItemUserControl.xaml.cs">
+      <DependentUpon>FileListItemUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LabelTwoTextboxUserControl.xaml.cs">
+      <DependentUpon>LabelTwoTextboxUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LabelTextboxUserControl.xaml.cs">
       <DependentUpon>LabelTextboxUserControl.xaml</DependentUpon>
     </Compile>
@@ -94,6 +101,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\FileListItemUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LabelTwoTextboxUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\LabelTextboxUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
