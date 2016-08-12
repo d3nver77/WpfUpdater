@@ -1,4 +1,4 @@
-﻿namespace UpdateCreator
+﻿namespace UpdateCreator.Models
 {
     public class UpdateXml
     {

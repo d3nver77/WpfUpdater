@@ -1,0 +1,51 @@
+﻿<Window x:Class="UpdateCreator.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:UpdateCreator.Views"
+        mc:Ignorable="d" DataContext="{Binding MainViewModel, Mode=OneWay, Source={StaticResource Locator}}"
+        Title="Update package Creator" MinHeight="400" Width="525" WindowStartupLocation="CenterScreen" SizeToContent="Height">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="200"/>
+            <ColumnDefinition Width="3"/>
+            <ColumnDefinition Width="*" MinWidth="200"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Column="0" Grid.IsSharedSizeScope="True" Margin="5" LastChildFill="True">
+            <views:LabelTextboxUserControl Label="Application Name:" Text="12345" DockPanel.Dock="Top"/>
+            <views:LabelTextboxUserControl Label="Upload path:" Text="1234567890" DockPanel.Dock="Bottom"/>
+            <Separator Margin="5,5,5,0" DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Hash:" Text="1234567890" IsReadOnly="True" DockPanel.Dock="Bottom"/>
+                        <views:LabelTextboxUserControl Label="Version:" Text="1234567890" IsReadOnly="True" DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Launch args:" Text="1234567890" DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Filename:" Text="1234567890"  DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Description:" Text="1234567890" MinHeight="100" IsMultiline="True"/>
+        </DockPanel>
+        <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,5"/>
+        <DockPanel Grid.Row="0" Grid.Column="2" Grid.IsSharedSizeScope="True" Margin="5" LastChildFill="True">
+            <views:LabelTextboxUserControl Label="Exlude mask:" Text="12345" DockPanel.Dock="Top" />
+            <ListView Margin="0,5,5,0"  />
+        </DockPanel>
+        <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Margin="0,20" HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="110"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" DataContext="{Binding CreateUpdatePackageCommand}" Command="{Binding Command}" ToolTip="{Binding HitText}" Margin="10,0">
+                <TextBlock Text="{Binding DisplayName}" TextWrapping="Wrap" TextAlignment="Center"/>
+            </Button>
+            <Button Grid.Column="1" DataContext="{Binding UploadOnServerCommand}" Command="{Binding Command}" ToolTip="{Binding HitText}" Margin="10,0">
+                <TextBlock Text="{Binding DisplayName}" TextWrapping="Wrap" TextAlignment="Center"/>
+            </Button>
+            <Button Grid.Column="2" DataContext="{Binding CloseCommand}" Command="{Binding Command}" ToolTip="{Binding HitText}" Margin="10,0">
+                <TextBlock Text="{Binding DisplayName}" TextWrapping="Wrap" TextAlignment="Center"/>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

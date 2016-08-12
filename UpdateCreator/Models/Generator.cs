@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace UpdateCreator
+namespace UpdateCreator.Models
 {
     public class Generator
     {
@@ -42,7 +42,7 @@ namespace UpdateCreator
         public void GetFileList()
         {
             this._fileList = Directory
-                .GetFiles(this.CurrentDirectory, "*.*", SearchOption.AllDirectories)
+                .GetFiles(this.CurrentDirectory, "*.*", SearchOption.TopDirectoryOnly)
                 .Where(name => !this.ExludeMaskList.Any(mask => name.IndexOf(mask, StringComparison.InvariantCultureIgnoreCase) >=0))
                 .Select(f=>f.Replace(this.CurrentDirectory, string.Empty)
                 .TrimStart('\\'))

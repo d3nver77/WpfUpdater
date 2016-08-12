@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
-namespace UpdateCreator
+namespace UpdateCreator.ViewModels
 {
     public class ViewModelBase : INotifyPropertyChanged
     {

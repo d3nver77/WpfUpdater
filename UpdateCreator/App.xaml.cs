@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using UpdateCreator.Models;
 
 namespace UpdateCreator
 {

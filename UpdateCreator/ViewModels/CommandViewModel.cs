@@ -1,7 +1,6 @@
-﻿using System;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
-namespace UpdateCreator
+namespace UpdateCreator.ViewModels
 {
     public class CommandViewModel : ViewModelBase
     {
