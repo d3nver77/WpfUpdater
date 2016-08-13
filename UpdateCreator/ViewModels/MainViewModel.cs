@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UpdateCreator.Models;
@@ -10,15 +11,7 @@ namespace UpdateCreator.ViewModels
     {
         public MainViewModel()
         {
-            var filelist = FileProvider.Instance.GetFilterFileList();
-            this.FileList = new ObservableCollection<CheckedFile>(filelist);
-
-
-            //FileList.Add(new CheckedFile("file1.txt"));
-            //FileList.Add(new CheckedFile("file2.txt"));
-            //FileList.Add(new CheckedFile("file3.txt", false) );
-            //FileList.Add(new CheckedFile("file4.txt"));
-            //FileList.Add(new CheckedFile("file5.txt", false));
+            
         }
 
         #region Properties
@@ -27,20 +20,23 @@ namespace UpdateCreator.ViewModels
         {
             get
             {
-                var mask = string.Join("; ", FileProvider.Instance.ExcludeMaskList);
-                return mask;
+                return FileProvider.Instance.Filter;
             }
             set
             {
-                var mask = value ?? string.Empty;
-                var maskSplitted = Regex.Split(mask, @"\s*;\s*");
-                FileProvider.Instance.ExcludeMaskList.Clear();
-                FileProvider.Instance.ExcludeMaskList.AddRange(maskSplitted);
+                FileProvider.Instance.Filter = value;
                 this.OnPropertyChanged();
+                this.OnPropertyChanged(()=> this.FileList);
             }
         }
 
-        public ObservableCollection<CheckedFile> FileList { get; }
+        public List<CheckedFile> FileList
+        {
+            get
+            {
+                return FileProvider.Instance.GetFilterFileList();
+            }
+        }
 
         #endregion Properties
         #region Commands
@@ -72,6 +68,16 @@ namespace UpdateCreator.ViewModels
             }
         }
 
+        private CommandViewModel _updateFilelistCommand = null;
+        public CommandViewModel UpdateFilelistCommand
+        {
+            get
+            {
+                return this._updateFilelistCommand
+                  ?? (this._updateFilelistCommand = new CommandViewModel("Refresh list", new RelayCommand(this.UpdateFileList)));
+            }
+        }
+
         #endregion Commands
 
         private void CreateUpdatePackage(object parameter)
@@ -86,7 +92,12 @@ namespace UpdateCreator.ViewModels
 
         private void Close(object obj)
         {
-            ExludeMasks += "; *.exe";
+            throw new System.NotImplementedException();
+        }
+
+        private void UpdateFileList(object obj)
+        {
+            this.OnPropertyChanged(()=> this.FileList);
         }
     }
 }

@@ -29,8 +29,13 @@
             <views:LabelTextboxUserControl Label="Description:" Text="1234567890" MinHeight="100" IsMultiline="True"/>
         </DockPanel>
         <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,5"/>
-        <DockPanel Grid.Row="0" Grid.Column="2" Grid.IsSharedSizeScope="True" Margin="5" LastChildFill="True">
-            <views:LabelTextboxUserControl Label="Exclude mask:" Text="{Binding ExludeMasks, Mode=TwoWay}" DockPanel.Dock="Top" />
+        <DockPanel Grid.Row="0" Grid.Column="2" Grid.IsSharedSizeScope="True" Margin="5">
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,5,0">
+                <Button DataContext="{Binding UpdateFilelistCommand}" Command="{Binding Command}" Content="&#x21bb;"
+                        DockPanel.Dock="Right" VerticalAlignment="Center" Padding="3,1" VerticalContentAlignment="Center"/>
+                <views:LabelTextboxUserControl Label="Exclude mask:" Text="{Binding ExludeMasks, Mode=TwoWay}" 
+                                               ToolTip="Wildcards ('*', '?') are available" Focusable="True"/>
+            </DockPanel>
             <ListView Margin="0,5,5,0" ItemsSource="{Binding FileList}" ScrollViewer.VerticalScrollBarVisibility="Visible" >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
