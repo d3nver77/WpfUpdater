@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace UpdateCreator.Views
 {
@@ -21,8 +22,13 @@ namespace UpdateCreator.Views
         }
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-            "Text", typeof(string), typeof(LabelTextboxUserControl), new PropertyMetadata(default(string)));
-        
+            "Text", typeof(string), typeof(LabelTextboxUserControl), new PropertyMetadata(default(string), PropertyChangedCallback));
+
+        private static void PropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            var bndExp = BindingOperations.GetBindingExpression(dependencyObject, TextProperty);
+        }
+
         public string Text
         {
             get { return (string) this.GetValue(TextProperty); }
@@ -51,6 +57,27 @@ namespace UpdateCreator.Views
         {
             InitializeComponent();
 
+            this.Loaded += (sender, args) =>
+            {
+                var bindingExpression = this.GetBindingExpression(TextProperty);
+                if (bindingExpression?.ParentBinding.UpdateSourceTrigger != UpdateSourceTrigger.PropertyChanged)
+                {
+                    return;
+                }
+                bindingExpression = BindingOperations.GetBindingExpression(this.TextBox, TextBox.TextProperty);
+                if (bindingExpression == null)
+                {
+                    return;
+                }
+                var oldBinding = bindingExpression.ParentBinding;
+                var newBinding = new Binding
+                {
+                    RelativeSource = oldBinding.RelativeSource,
+                    Path = oldBinding.Path,
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                };
+                this.TextBox.SetBinding(TextBox.TextProperty, newBinding);
+            };
         }
     }
 }

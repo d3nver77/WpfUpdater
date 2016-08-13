@@ -19,10 +19,9 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Column="0" Grid.IsSharedSizeScope="True" Margin="5" LastChildFill="True">
             <views:LabelTextboxUserControl Label="Application Name:" Text="12345" DockPanel.Dock="Top"/>
-            <views:LabelTextboxUserControl Label="Upload path:" Text="1234567890" DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Upload path:" Text="{Binding UploadPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
             <Separator Margin="5,5,5,5" DockPanel.Dock="Bottom"/>
             <views:LabelUrlFileUserControl Label="Url:" Url="1234567890" Filename="update.zip" DockPanel.Dock="Bottom"/>
-            <views:LabelTextboxUserControl Label="Hash:" Text="1234567890" IsReadOnly="True" DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Version:" Text="1234567890" IsReadOnly="True" DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Launch args:" Text="1234567890" DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Filename:" Text="1234567890"  DockPanel.Dock="Bottom"/>

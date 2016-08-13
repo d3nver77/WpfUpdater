@@ -38,6 +38,7 @@ namespace UpdateCreator.ViewModels
             }
         }
 
+        public string UploadPath { get; set; }
         #endregion Properties
 
         #region Commands
@@ -55,7 +56,11 @@ namespace UpdateCreator.ViewModels
             get
             {
                 return this._uploadOnServerCommand
-                  ?? (this._uploadOnServerCommand = new CommandViewModel("Upload on server", new RelayCommand(this.UploadOnServer)));
+                  ?? (this._uploadOnServerCommand = new CommandViewModel("Upload on server", new RelayCommand(this.UploadOnServer,
+                      delegate
+                      {
+                          return !string.IsNullOrEmpty(this.UploadPath);
+                      })));
             }
         }
 
