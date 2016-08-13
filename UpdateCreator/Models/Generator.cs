@@ -12,9 +12,9 @@ namespace UpdateCreator.Models
 {
     public class Generator
     {
-        private static readonly string[] ExludeMaskArray = new[] {".pdb", ".vshost.", ".config"};
+        private static readonly string[] ExcludeMaskArray = new[] {".pdb", ".vshost.", ".config"};
 
-        public List<string> ExludeMaskList { get; private set; }
+        public List<string> ExcludeMaskList { get; private set; }
 
         private List<string> _fileList;
 
@@ -33,8 +33,8 @@ namespace UpdateCreator.Models
 
         public Generator()
         {
-            this.ExludeMaskList = new List<string>();
-            this.ExludeMaskList.AddRange(ExludeMaskArray);
+            this.ExcludeMaskList = new List<string>();
+            this.ExcludeMaskList.AddRange(ExcludeMaskArray);
             this.IncludeFilelist = new List<string>();
             this.IncludeFilelist.Add("SomeAppWithUpdate.exe.config");
         }
@@ -43,7 +43,7 @@ namespace UpdateCreator.Models
         {
             this._fileList = Directory
                 .GetFiles(this.CurrentDirectory, "*.*", SearchOption.TopDirectoryOnly)
-                .Where(name => !this.ExludeMaskList.Any(mask => name.IndexOf(mask, StringComparison.InvariantCultureIgnoreCase) >=0))
+                .Where(name => !this.ExcludeMaskList.Any(mask => name.IndexOf(mask, StringComparison.InvariantCultureIgnoreCase) >=0))
                 .Select(f=>f.Replace(this.CurrentDirectory, string.Empty)
                 .TrimStart('\\'))
                 .Where(name => !string.Equals(name, UpdateFilenameZip, StringComparison.InvariantCultureIgnoreCase))

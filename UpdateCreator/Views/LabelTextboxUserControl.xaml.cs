@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -21,6 +22,7 @@ namespace UpdateCreator.Views
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
             "Text", typeof(string), typeof(LabelTextboxUserControl), new PropertyMetadata(default(string)));
+        
         public string Text
         {
             get { return (string) this.GetValue(TextProperty); }

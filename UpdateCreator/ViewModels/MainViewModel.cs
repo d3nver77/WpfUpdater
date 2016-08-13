@@ -1,4 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text.RegularExpressions;
+using UpdateCreator.Models;
 using UpdateCreator.ViewModels.Commands;
 
 namespace UpdateCreator.ViewModels
@@ -7,16 +10,40 @@ namespace UpdateCreator.ViewModels
     {
         public MainViewModel()
         {
-            this.FileList = new ObservableCollection<CheckedFile>();
-            FileList.Add(new CheckedFile() { Filename = "file1.txt", IsSelected = true});
-            FileList.Add(new CheckedFile() { Filename = "file2.txt", IsSelected = true});
-            FileList.Add(new CheckedFile() { Filename = "file3.txt", IsSelected = false});
-            FileList.Add(new CheckedFile() { Filename = "file4.txt", IsSelected = true});
-            FileList.Add(new CheckedFile() { Filename = "file5.txt", IsSelected = false});
+            var filelist = FileProvider.Instance.GetFilterFileList();
+            this.FileList = new ObservableCollection<CheckedFile>(filelist);
+
+
+            //FileList.Add(new CheckedFile("file1.txt"));
+            //FileList.Add(new CheckedFile("file2.txt"));
+            //FileList.Add(new CheckedFile("file3.txt", false) );
+            //FileList.Add(new CheckedFile("file4.txt"));
+            //FileList.Add(new CheckedFile("file5.txt", false));
         }
 
-        public ObservableCollection<CheckedFile> FileList { get; private set; }
+        #region Properties
 
+        public string ExludeMasks
+        {
+            get
+            {
+                var mask = string.Join("; ", FileProvider.Instance.ExcludeMaskList);
+                return mask;
+            }
+            set
+            {
+                var mask = value ?? string.Empty;
+                var maskSplitted = Regex.Split(mask, @"\s*;\s*");
+                FileProvider.Instance.ExcludeMaskList.Clear();
+                FileProvider.Instance.ExcludeMaskList.AddRange(maskSplitted);
+                this.OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<CheckedFile> FileList { get; }
+
+        #endregion Properties
+        #region Commands
 
         private CommandViewModel _createUpdatePackageCommand = null;
         public CommandViewModel CreateUpdatePackageCommand
@@ -45,6 +72,8 @@ namespace UpdateCreator.ViewModels
             }
         }
 
+        #endregion Commands
+
         private void CreateUpdatePackage(object parameter)
         {
             throw new System.NotImplementedException();
@@ -57,7 +86,7 @@ namespace UpdateCreator.ViewModels
 
         private void Close(object obj)
         {
-            throw new System.NotImplementedException();
+            ExludeMasks += "; *.exe";
         }
     }
 }

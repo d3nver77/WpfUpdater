@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:UpdateCreator.Views"
         mc:Ignorable="d" DataContext="{Binding MainViewModel, Mode=OneWay, Source={StaticResource Locator}}"
-        Title="Update package Creator" MinHeight="500" MinWidth="750" 
+        Title="Update package Creator" MinHeight="500" MinWidth="750" Height="500"
         WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" MinWidth="200"/>
+            <ColumnDefinition Width="*" MinWidth="266"/>
             <ColumnDefinition Width="3"/>
             <ColumnDefinition Width="*" MinWidth="200"/>
         </Grid.ColumnDefinitions>
@@ -30,7 +30,7 @@
         </DockPanel>
         <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,5"/>
         <DockPanel Grid.Row="0" Grid.Column="2" Grid.IsSharedSizeScope="True" Margin="5" LastChildFill="True">
-            <views:LabelTextboxUserControl Label="Exlude mask:" Text="12345" DockPanel.Dock="Top" />
+            <views:LabelTextboxUserControl Label="Exclude mask:" Text="{Binding ExludeMasks, Mode=TwoWay}" DockPanel.Dock="Top" />
             <ListView Margin="0,5,5,0" ItemsSource="{Binding FileList}" ScrollViewer.VerticalScrollBarVisibility="Visible" >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">

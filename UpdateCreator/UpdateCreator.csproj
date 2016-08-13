@@ -76,9 +76,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\CheckedFile.cs" />
+    <Compile Include="Models\FileProvider.cs" />
     <Compile Include="Models\Generator.cs" />
     <Compile Include="Models\UpdateXml.cs" />
-    <Compile Include="ViewModels\CheckedFile.cs" />
     <Compile Include="ViewModels\Commands\RelayCommand.cs" />
     <Compile Include="ViewModels\CommandViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
@@ -88,8 +89,8 @@
     <Compile Include="Views\FileListItemUserControl.xaml.cs">
       <DependentUpon>FileListItemUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\LabelTwoTextboxUserControl.xaml.cs">
-      <DependentUpon>LabelTwoTextboxUserControl.xaml</DependentUpon>
+    <Compile Include="Views\LabelUrlFileUserControl.xaml.cs">
+      <DependentUpon>LabelUrlFileUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\LabelTextboxUserControl.xaml.cs">
       <DependentUpon>LabelTextboxUserControl.xaml</DependentUpon>
@@ -105,7 +106,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\LabelTwoTextboxUserControl.xaml">
+    <Page Include="Views\LabelUrlFileUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

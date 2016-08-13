@@ -9,9 +9,9 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="col1"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="0.5*"/>
+            <ColumnDefinition Width="0.5*" MinWidth="70"/>
         </Grid.ColumnDefinitions>
         <Label Grid.Column="0" HorizontalAlignment="Right" Margin="0" Padding="0" VerticalAlignment="Center" VerticalContentAlignment="Center"
                Content="{Binding Label, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:LabelUrlFileUserControl}}}" />
