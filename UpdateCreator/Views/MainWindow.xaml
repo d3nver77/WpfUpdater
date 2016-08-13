@@ -34,7 +34,7 @@
                 <Button DataContext="{Binding UpdateFilelistCommand}" Command="{Binding Command}" Content="&#x21bb;"
                         DockPanel.Dock="Right" VerticalAlignment="Center" Padding="3,1" VerticalContentAlignment="Center"/>
                 <views:LabelTextboxUserControl Label="Exclude mask:" Text="{Binding ExludeMasks, Mode=TwoWay}" 
-                                               ToolTip="Wildcards ('*', '?') are available" Focusable="True"/>
+                                               ToolTip="Wildcards ('*', '?') are available" />
             </DockPanel>
             <ListView Margin="0,5,5,0" ItemsSource="{Binding FileList}" ScrollViewer.VerticalScrollBarVisibility="Visible" >
                 <ListView.ItemContainerStyle>
