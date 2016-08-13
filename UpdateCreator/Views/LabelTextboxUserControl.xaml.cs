@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace UpdateCreator.Views
 {
@@ -21,13 +23,21 @@ namespace UpdateCreator.Views
             set { this.SetValue(LabelProperty, value); }
         }
 
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-            "Text", typeof(string), typeof(LabelTextboxUserControl), new PropertyMetadata(default(string), PropertyChangedCallback));
+        //public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
+        //    "Text", typeof(string), typeof(LabelTextboxUserControl), new PropertyMetadata(default(string)));
 
-        private static void PropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
-        {
-            var bndExp = BindingOperations.GetBindingExpression(dependencyObject, TextProperty);
-        }
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
+            "Text", typeof(string), typeof(LabelTextboxUserControl), new FrameworkPropertyMetadata
+            (
+                string.Empty,
+                FrameworkPropertyMetadataOptions.Journal |
+                FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                null, //new PropertyChangedCallback(TextBox.OnTextPropertyChanged),
+                null, //new CoerceValueCallback(TextBox.CoerceText),
+                true,
+                UpdateSourceTrigger.PropertyChanged
+                ));
+
 
         public string Text
         {
@@ -59,25 +69,63 @@ namespace UpdateCreator.Views
 
             this.Loaded += (sender, args) =>
             {
-                var bindingExpression = this.GetBindingExpression(TextProperty);
-                if (bindingExpression?.ParentBinding.UpdateSourceTrigger != UpdateSourceTrigger.PropertyChanged)
+                var bindingExpressionUrl = this.GetBindingExpression(TextProperty);
+
+                if (bindingExpressionUrl?.ParentBinding.UpdateSourceTrigger != UpdateSourceTrigger.LostFocus)
                 {
-                    return;
+                    this.UpdateBinding(TextProperty);
                 }
-                bindingExpression = BindingOperations.GetBindingExpression(this.TextBox, TextBox.TextProperty);
+            };
+        }
+
+        private IEnumerable<TextBox> _textBoxes;
+        private IEnumerable<TextBox> TextBoxes
+        {
+            get { return this._textBoxes ?? (this._textBoxes = FindVisualChildren<TextBox>(this)); }
+        }
+
+        private void UpdateBinding(DependencyProperty dependencyProperty)
+        {
+            foreach (var textBox in this.TextBoxes)
+            {
+                var bindingExpression = BindingOperations.GetBindingExpression(textBox, TextBox.TextProperty);
                 if (bindingExpression == null)
                 {
                     return;
                 }
                 var oldBinding = bindingExpression.ParentBinding;
+                if (oldBinding.Path.Path != dependencyProperty.Name)
+                {
+                    return;
+                }
                 var newBinding = new Binding
                 {
                     RelativeSource = oldBinding.RelativeSource,
-                    Path = oldBinding.Path,
+                    Path = new PropertyPath(dependencyProperty.Name),
                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                 };
-                this.TextBox.SetBinding(TextBox.TextProperty, newBinding);
-            };
+                textBox.SetBinding(TextBox.TextProperty, newBinding);
+            }
+        }
+
+        private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
+            }
         }
     }
 }

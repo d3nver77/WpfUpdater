@@ -48,7 +48,7 @@ namespace UpdateCreator.Models
             set
             {
                 var mask = value ?? string.Empty;
-                var maskSplitted = Regex.Split(mask, @"\s*;\s*");
+                var maskSplitted = Regex.Split(mask.Trim(), @"\s*;\s*");
                 this._excludeMaskList.Clear();
                 this._excludeMaskList.AddRange(maskSplitted);
             }

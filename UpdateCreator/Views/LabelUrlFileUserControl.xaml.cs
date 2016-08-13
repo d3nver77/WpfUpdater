@@ -1,6 +1,10 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media;
 
 namespace UpdateCreator.Views
 {
@@ -20,7 +24,16 @@ namespace UpdateCreator.Views
         }
 
         public static readonly DependencyProperty UrlProperty = DependencyProperty.Register(
-            "Url", typeof(string), typeof(LabelUrlFileUserControl), new PropertyMetadata(default(string)));
+            "Url", typeof(string), typeof(LabelUrlFileUserControl), new FrameworkPropertyMetadata
+            (
+                string.Empty,
+                FrameworkPropertyMetadataOptions.Journal |
+                FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                null,
+                null,
+                true,
+                UpdateSourceTrigger.PropertyChanged
+                ));
         public string Url
         {
             get { return (string) this.GetValue(UrlProperty); }
@@ -35,17 +48,76 @@ namespace UpdateCreator.Views
             set { this.SetValue(FilenameProperty, value); }
         }
 
-
         #endregion DependencyProperty
 
         public LabelUrlFileUserControl()
         {
             InitializeComponent();
-            if (DesignerProperties.GetIsInDesignMode(this))
+            this.Loaded += (sender, args) =>
             {
-                this.Label = "Design Label Text";
-                this.Url = "Design Text";
+                var bindingExpressionUrl = this.GetBindingExpression(UrlProperty);
+                var bindingExpressionFilename = this.GetBindingExpression(FilenameProperty);
+
+                if (bindingExpressionUrl?.ParentBinding.UpdateSourceTrigger != UpdateSourceTrigger.LostFocus)
+                {
+                    this.UpdateBinding(UrlProperty);
+                }
+                if (bindingExpressionFilename?.ParentBinding.UpdateSourceTrigger != UpdateSourceTrigger.LostFocus)
+                {
+                    this.UpdateBinding(FilenameProperty);
+                }
+            };
+        }
+
+        private IEnumerable<TextBox> _textBoxes;
+        private IEnumerable<TextBox> TextBoxes
+        {
+            get { return this._textBoxes ?? (this._textBoxes = FindVisualChildren<TextBox>(this)); }
+        }
+
+        private void UpdateBinding(DependencyProperty dependencyProperty)
+        {
+            foreach (var textBox in this.TextBoxes)
+            {
+                var bindingExpression = BindingOperations.GetBindingExpression(textBox, TextBox.TextProperty);
+                if (bindingExpression == null)
+                {
+                    return;
+                }
+                var oldBinding = bindingExpression.ParentBinding;
+                if (oldBinding.Path.Path != dependencyProperty.Name)
+                {
+                    return;
+                }
+                var newBinding = new Binding
+                {
+                    RelativeSource = oldBinding.RelativeSource,
+                    Path = new PropertyPath(dependencyProperty.Name),
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                };
+                textBox.SetBinding(TextBox.TextProperty, newBinding);
             }
         }
+
+        private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
+            }
+        }
+
     }
 }

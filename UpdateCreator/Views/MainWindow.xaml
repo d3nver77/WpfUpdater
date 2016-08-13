@@ -18,11 +18,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Column="0" Grid.IsSharedSizeScope="True" Margin="5" LastChildFill="True">
-            <views:LabelTextboxUserControl Label="Application Name:" Text="12345" DockPanel.Dock="Top"/>
-            <views:LabelTextboxUserControl Label="Upload path:" Text="{Binding UploadPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Application Name:" Text="{Binding ApplicationName}" DockPanel.Dock="Top"/>
+            <views:LabelTextboxUserControl Label="Upload path:" Text="{Binding UploadPath}" DockPanel.Dock="Bottom"/>
             <Separator Margin="5,5,5,5" DockPanel.Dock="Bottom"/>
-            <views:LabelUrlFileUserControl Label="Url:" Url="1234567890" Filename="update.zip" DockPanel.Dock="Bottom"/>
-            <views:LabelTextboxUserControl Label="Version:" Text="1234567890" IsReadOnly="True" DockPanel.Dock="Bottom"/>
+            <views:LabelUrlFileUserControl Label="Url:" Url="{Binding Url}" Filename="update.zip" DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Version:" Text="{Binding Version}" IsReadOnly="True" DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Launch args:" Text="1234567890" DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Filename:" Text="1234567890"  DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Description:" Text="1234567890" MinHeight="100" IsMultiline="True"/>
@@ -32,7 +32,7 @@
             <DockPanel DockPanel.Dock="Top" Margin="0,0,5,0">
                 <Button DataContext="{Binding UpdateFilelistCommand}" Command="{Binding Command}" Content="&#x21bb;"
                         DockPanel.Dock="Right" VerticalAlignment="Center" Padding="3,1" VerticalContentAlignment="Center"/>
-                <views:LabelTextboxUserControl Label="Exclude mask:" Text="{Binding ExludeMasks, Mode=TwoWay}" 
+                <views:LabelTextboxUserControl Label="Exclude mask:" Text="{Binding ExludeMasks, UpdateSourceTrigger=LostFocus}" 
                                                ToolTip="Wildcards ('*', '?') are available" />
             </DockPanel>
             <ListView Margin="0,5,5,0" ItemsSource="{Binding FileList}" ScrollViewer.VerticalScrollBarVisibility="Visible" >

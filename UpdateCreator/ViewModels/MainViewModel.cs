@@ -38,7 +38,15 @@ namespace UpdateCreator.ViewModels
             }
         }
 
+        public string ApplicationName { get; set; }
+        public string Description { get; set; }
+        public string Filename { get; set; }
+        public string LaunchArguments { get; set; }
+        public string Version { get; set; }
+        public string Url { get; set; }
+        public string UpdatePackageName { get; set; }
         public string UploadPath { get; set; }
+
         #endregion Properties
 
         #region Commands
