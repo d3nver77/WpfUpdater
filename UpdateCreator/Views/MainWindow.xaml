@@ -18,14 +18,15 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Column="0" Grid.IsSharedSizeScope="True" Margin="5" LastChildFill="True">
+            <views:LabelTextboxUserControl Label="Package Name:" Text="{Binding PackageName}" DockPanel.Dock="Top"/>
             <views:LabelTextboxUserControl Label="Application Name:" Text="{Binding ApplicationName}" DockPanel.Dock="Top"/>
             <views:LabelTextboxUserControl Label="Upload path:" Text="{Binding UploadPath}" DockPanel.Dock="Bottom"/>
             <Separator Margin="5,5,5,5" DockPanel.Dock="Bottom"/>
-            <views:LabelUrlFileUserControl Label="Url:" Url="{Binding Url}" Filename="update.zip" DockPanel.Dock="Bottom"/>
+            <views:LabelUrlFileUserControl Label="Url:" Url="{Binding Url}" Filename="{Binding PackageFilename}" DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Version:" Text="{Binding Version}" IsReadOnly="True" DockPanel.Dock="Bottom"/>
-            <views:LabelTextboxUserControl Label="Launch args:" Text="1234567890" DockPanel.Dock="Bottom"/>
-            <views:LabelTextboxUserControl Label="Filename:" Text="1234567890"  DockPanel.Dock="Bottom"/>
-            <views:LabelTextboxUserControl Label="Description:" Text="1234567890" MinHeight="100" IsMultiline="True"/>
+            <views:LabelTextboxUserControl Label="Launch args:" Text="{Binding LaunchArguments}" DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Filename:" Text="{Binding Filename}"  DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Description:" Text="{Binding Description}" MinHeight="100" IsMultiline="True"/>
         </DockPanel>
         <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,5"/>
         <DockPanel Grid.Row="0" Grid.Column="2" Grid.IsSharedSizeScope="True" Margin="5">

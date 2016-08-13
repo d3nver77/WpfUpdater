@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows;
 using UpdateCreator.Models;
 using UpdateCreator.ViewModels.Commands;
 
@@ -11,7 +12,7 @@ namespace UpdateCreator.ViewModels
     {
         public MainViewModel()
         {
-            
+            this.PackageName = "update";
         }
 
         #region Properties
@@ -38,14 +39,47 @@ namespace UpdateCreator.ViewModels
             }
         }
 
+        private string _packageName;
+        public string PackageName
+        {
+            get { return this._packageName; }
+            set
+            {
+                if (this._packageName != value)
+                {
+                    this._packageName = value;
+                    this.OnPropertyChanged();
+                    this.OnPropertyChanged(() => this.PackageFilename);
+                }
+            }
+        }
+
         public string ApplicationName { get; set; }
         public string Description { get; set; }
         public string Filename { get; set; }
         public string LaunchArguments { get; set; }
         public string Version { get; set; }
         public string Url { get; set; }
-        public string UpdatePackageName { get; set; }
+
+        public string PackageFilename
+        {
+            get
+            {
+                return string.IsNullOrEmpty(this.PackageName) ? string.Empty : string.Format("{0}.zip", this.PackageName);
+            }
+        }
+
         public string UploadPath { get; set; }
+
+        public bool IsPackageValid
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(this.ApplicationName) &&
+                       !string.IsNullOrEmpty(this.PackageName) &&
+                       !string.IsNullOrEmpty(this.Url);
+            }
+        }
 
         #endregion Properties
 
@@ -55,7 +89,7 @@ namespace UpdateCreator.ViewModels
         public CommandViewModel CreateUpdatePackageCommand
         {
             get { return this._createUpdatePackageCommand 
-                    ?? (this._createUpdatePackageCommand = new CommandViewModel("Create update package", new RelayCommand(this.CreateUpdatePackage))); }
+                    ?? (this._createUpdatePackageCommand = new CommandViewModel("Create update package", new RelayCommand(this.CreateUpdatePackage, p => this.IsPackageValid))); }
         }
 
         private CommandViewModel _uploadOnServerCommand = null;
@@ -65,10 +99,7 @@ namespace UpdateCreator.ViewModels
             {
                 return this._uploadOnServerCommand
                   ?? (this._uploadOnServerCommand = new CommandViewModel("Upload on server", new RelayCommand(this.UploadOnServer,
-                      delegate
-                      {
-                          return !string.IsNullOrEmpty(this.UploadPath);
-                      })));
+                      p => !string.IsNullOrEmpty(this.UploadPath))));
             }
         }
 
@@ -106,7 +137,7 @@ namespace UpdateCreator.ViewModels
 
         private void Close(object obj)
         {
-            throw new System.NotImplementedException();
+            Application.Current.Shutdown();
         }
 
         private void UpdateFileList(object obj)
