@@ -55,13 +55,13 @@ namespace UpdateCreator.ViewModels
 
         public CommandViewModel(string displayName, ICommand command)
         {
-            this.DisplayName = displayName ?? string.Empty;
-            this.Command = command;
+            this._displayName = displayName ?? string.Empty;
+            this._command = command;
         }
 
         public CommandViewModel(string displayName, ICommand command, string hitText) : this(displayName, command)
         {
-            this.HitText = hitText;
+            this._hitText = hitText;
         }
     }
 }
