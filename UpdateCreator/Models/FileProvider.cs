@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -21,7 +22,7 @@ namespace UpdateCreator.Models
 
         #endregion Instance Default
 
-        public event EventHandler FilelistChangedHandler;
+        public event EventHandler FilelistChangedHandler = (sender, args) => { };
 
         private readonly List<string> _excludeMaskList = new List<string>()
         {
@@ -37,34 +38,35 @@ namespace UpdateCreator.Models
                 var excludeRegexMaskList = this._excludeMaskList
                     .Select(m => string.Format("^{0}$", Regex.Escape(m).Replace(@"\*", ".*").Replace(@"\?", ".{1}")))
                     .ToList();
-                excludeRegexMaskList.Add(string.Format("^{0}$", Regex.Escape(this.CurrentAssemblyFilename).Replace(@"\*", ".*").Replace(@"\?", ".{1}")));
-                excludeRegexMaskList.Add(string.Format("^{0}$", Regex.Escape(this.CurrentAssemblyConfigFilename).Replace(@"\*", ".*").Replace(@"\?", ".{1}")));
-                if (this._package != null)
-                {
-                    excludeRegexMaskList.Add(string.Format("^{0}$", Regex.Escape(this._package.PackageFilenameZip).Replace(@"\*", ".*").Replace(@"\?", ".{1}")));
-                    excludeRegexMaskList.Add(string.Format("^{0}$", Regex.Escape(this._package.PackageFilenameXml).Replace(@"\*", ".*").Replace(@"\?", ".{1}")));
-                }
                 return excludeRegexMaskList;
             }
         }
 
-        private string CurrentAssemblyFilename
+        private List<string> ExcludeRegexFileList
         {
-            get { return Path.GetFileName(Assembly.GetEntryAssembly().Location); }
+            get
+            {
+                var excludeRegexFileList = new List<string>();
+                excludeRegexFileList.Add(string.Format("^{0}$", Regex.Escape(this.CurrentAssemblyMaskFilename).Replace(@"\*", ".*").Replace(@"\?", ".{1}")));
+                if (this._package != null)
+                {
+                    excludeRegexFileList.Add(string.Format("^{0}$", Regex.Escape(this._package.PackageFilenameZip).Replace(@"\*", ".*").Replace(@"\?", ".{1}")));
+                    excludeRegexFileList.Add(string.Format("^{0}$", Regex.Escape(this._package.PackageFilenameXml).Replace(@"\*", ".*").Replace(@"\?", ".{1}")));
+                }
+                return excludeRegexFileList;
+            }
         }
-        private string CurrentAssemblyConfigFilename
+
+        private string CurrentAssemblyMaskFilename
         {
-            get { return Path.GetFileName(Assembly.GetEntryAssembly().Location) + ".*"; }
+            get { return Assembly.GetEntryAssembly().GetName().Name + ".*"; }
         }
 
         private Package _package;
         public void PackageChanged(Package package)
         {
             this._package = package;
-            if (this.FilelistChangedHandler != null)
-            {
-                this.FilelistChangedHandler(this, new EventArgs());
-            }
+            this.FilelistChangedHandler(this, new EventArgs());
         }
 
         private string CurrentDirectory
@@ -81,31 +83,41 @@ namespace UpdateCreator.Models
                 var maskSplitted = Regex.Split(mask.Trim(), @"\s*;\s*");
                 this._excludeMaskList.Clear();
                 this._excludeMaskList.AddRange(maskSplitted);
-                if (this.FilelistChangedHandler != null)
-                {
-                    this.FilelistChangedHandler(this, new EventArgs());
-                }
+                this.FilelistChangedHandler(this, new EventArgs());
             }
         }
-
-        private IEnumerable<CheckedFile> GetFileList()
+        public List<CheckedFile> GetFileList()
         {
-            var fileList = Directory
-                .GetFiles(this.CurrentDirectory, "*.*", SearchOption.TopDirectoryOnly)
-                .Select(f => f.Replace(this.CurrentDirectory, string.Empty).TrimStart('\\'))
-                .Select(f => new CheckedFile(f));
-            return fileList;
-        }
-
-        public List<CheckedFile> GetFilterFileList()
-        {
-            var fileList = this.GetFileList().ToList();
+            var fileList = this.CreateFileList().ToList();
             var pattern = string.Join("|", this.ExcludeRegexMaskList);
             foreach (var file in fileList)
             {
                 file.IsSelected = !Regex.IsMatch(file.Filename, pattern, RegexOptions.IgnoreCase);
             }
             return fileList;
+        }
+
+        private IEnumerable<CheckedFile> CreateFileList()
+        {
+            var fileList = Directory
+                .GetFiles(this.CurrentDirectory, "*.*", SearchOption.TopDirectoryOnly)
+                .Select(f => f.Replace(this.CurrentDirectory, string.Empty).TrimStart('\\'))
+                .Select(f =>
+                {
+                    var checkedFile = new CheckedFile(f);
+                    checkedFile.PropertyChanged += this.CheckedFileOnPropertyChanged;
+                    return checkedFile;
+                });
+            return fileList;
+        }
+
+        private void CheckedFileOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        {
+            var file = sender as CheckedFile;
+            if (file == null || !file.IsSelected)
+                return;
+            var pattern = string.Join("|", this.ExcludeRegexFileList);
+            file.IsSelected = !Regex.IsMatch(file.Filename, pattern, RegexOptions.IgnoreCase);
         }
     }
 }

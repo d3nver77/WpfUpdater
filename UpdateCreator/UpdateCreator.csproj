@@ -81,6 +81,7 @@
     <Compile Include="Models\Generator.cs" />
     <Compile Include="Models\PackageBuilder.cs" />
     <Compile Include="Models\Package.cs" />
+    <Compile Include="Models\PackageEventArgs.cs" />
     <Compile Include="ViewModels\Commands\RelayCommand.cs" />
     <Compile Include="ViewModels\CommandViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

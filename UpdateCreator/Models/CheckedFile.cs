@@ -1,14 +1,39 @@
-﻿namespace UpdateCreator.Models
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace UpdateCreator.Models
 {
-    public class CheckedFile
+    public class CheckedFile : INotifyPropertyChanged
     {
-        public bool IsSelected { get; set; }
+        private bool _isSelected;
+
+        public bool IsSelected
+        {
+            get { return this._isSelected; }
+            set
+            {
+                if (this._isSelected == value)
+                {
+                    return;
+                }
+                this._isSelected = value;
+                if (this._isSelected)
+                    this.OnPropertyChanged();
+            }
+        }
+
         public string Filename { get; set; }
         
-        public CheckedFile(string filename, bool isSelected = true)
+        public CheckedFile(string filename)
         {
             this.Filename = filename;
-            this.IsSelected = isSelected;
+            this.IsSelected = false;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged = (sender, args) => { };
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

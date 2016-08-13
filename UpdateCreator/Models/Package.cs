@@ -2,33 +2,18 @@
 
 namespace UpdateCreator.Models
 {
-
-    public class PackageEventArgs : EventArgs
-    {
-        public Package Package { get; set; }
-
-        public PackageEventArgs(Package package)
-        {
-            this.Package = package;
-        }
-    }
-
     public class Package
     {
-        public event EventHandler<PackageEventArgs> PackageNameChanged;
+        public event EventHandler<PackageEventArgs> PackageNameChanged = (sender, args) => { };
 
         private string _packageName;
-
         public string PackageName
         {
             get { return this._packageName; }
             set
             {
                 this._packageName = value;
-                if (this.PackageNameChanged != null)
-                {
-                    this.PackageNameChanged(this, new PackageEventArgs(this));
-                }
+                this.PackageNameChanged(this, new PackageEventArgs(this));
             }
         }
 

@@ -10,20 +10,20 @@ namespace UpdateCreator.Models
     {
         private readonly Package _package;
 
+        public PackageBuilder(Package package)
+        {
+            this._package = package;
+        }
+
         private List<string> _fileList
         {
             get
             {
-                return FileProvider.Default.GetFilterFileList()
+                return FileProvider.Default.GetFileList()
                     .Where(f => f.IsSelected)
                     .Select(f => f.Filename)
                     .ToList();
             }
-        }
-
-        public PackageBuilder(Package package)
-        {
-            this._package = package;
         }
 
         public bool Create()
@@ -32,14 +32,12 @@ namespace UpdateCreator.Models
             {
                 throw new System.Exception("Package can't be null!");
             }
-            
             return this.CreatePackage();
         }
 
         private bool CreatePackage()
         {
             this.RemovePackage();
-
             try
             {
                 this.CreatePackageZip();

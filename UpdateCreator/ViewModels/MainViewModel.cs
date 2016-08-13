@@ -11,6 +11,7 @@ namespace UpdateCreator.ViewModels
     public class MainViewModel : ViewModelBase
     {
         private Package _package = new Package();
+
         public MainViewModel()
         {
             FileProvider.Default.FilelistChangedHandler += (sender, args) =>
@@ -33,23 +34,13 @@ namespace UpdateCreator.ViewModels
 
         public string ExludeMasks
         {
-            get
-            {
-                return FileProvider.Default.Filter;
-            }
-            set
-            {
-                FileProvider.Default.Filter = value;
-                this.OnPropertyChanged();
-            }
+            get { return FileProvider.Default.Filter; }
+            set { FileProvider.Default.Filter = value; }
         }
 
         public List<CheckedFile> FileList
         {
-            get
-            {
-                return FileProvider.Default.GetFilterFileList();
-            }
+            get { return FileProvider.Default.GetFileList(); }
         }
 
         public string PackageName
@@ -63,6 +54,7 @@ namespace UpdateCreator.ViewModels
                 }
             }
         }
+
         public string ApplicationName
         {
             get { return this._package.ApplicationName; }
@@ -74,6 +66,7 @@ namespace UpdateCreator.ViewModels
                     }
             }
         }
+
         public string Description
         {
             get { return this._package.Description; }
@@ -195,7 +188,7 @@ namespace UpdateCreator.ViewModels
         {
             var packageBuilder = new PackageBuilder(this._package);
             var isPackageCreated = packageBuilder.Create();
-            //this.OnPropertyChanged(()=> this.FileList);
+            this.OnPropertyChanged(()=> this.FileList);
         }
 
         private void UploadOnServer(object obj)
