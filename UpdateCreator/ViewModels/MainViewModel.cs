@@ -39,6 +39,7 @@ namespace UpdateCreator.ViewModels
         }
 
         #endregion Properties
+
         #region Commands
 
         private CommandViewModel _createUpdatePackageCommand = null;
