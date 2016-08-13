@@ -1,9 +1,12 @@
-﻿namespace UpdateCreator.ViewModels
+﻿using UpdateCreator.Models;
+
+namespace UpdateCreator.ViewModels
 {
     public class ViewModelLocator
     {
         public ViewModelLocator()
         {
+            
         }
 
         private MainViewModel _mainViewModel;

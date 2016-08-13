@@ -73,16 +73,16 @@ namespace UpdateCreator.Models
 
         public void CreateUpdateXml()
         {
-            var updateXml = new UpdateXml()
-            {
-                ApplicationName = "SomeAppWithUpdate",
-                Url = "www.test.com/" + UpdateFilenameZip,
-                Hash = this.GetHash(),
-                Description = "New version.", 
-                Filename = "SomeAppWithUpdate.exe",
-                LaunchArguments = string.Empty
-            };
-            updateXml.Version = FileVersionInfo.GetVersionInfo(updateXml.Filename).ProductVersion;
+            //var updateXml = new UpdateXml()
+            //{
+            //    ApplicationName = "SomeAppWithUpdate",
+            //    Url = "www.test.com/" + UpdateFilenameZip,
+            //    Hash = this.GetHash(),
+            //    Description = "New version.", 
+            //    Filename = "SomeAppWithUpdate.exe",
+            //    LaunchArguments = string.Empty
+            //};
+            //updateXml.Version = FileVersionInfo.GetVersionInfo(updateXml.Filename).ProductVersion;
         }
 
         private string GetHash()

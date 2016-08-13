@@ -23,7 +23,7 @@
             <views:LabelTextboxUserControl Label="Upload path:" Text="{Binding UploadPath}" DockPanel.Dock="Bottom"/>
             <Separator Margin="5,5,5,5" DockPanel.Dock="Bottom"/>
             <views:LabelUrlFileUserControl Label="Url:" Url="{Binding Url}" Filename="{Binding PackageFilename}" DockPanel.Dock="Bottom"/>
-            <views:LabelTextboxUserControl Label="Version:" Text="{Binding Version}" IsReadOnly="True" DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Version:" Text="{Binding Version, Mode=OneWay}" IsReadOnly="True" DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Launch args:" Text="{Binding LaunchArguments}" DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Filename:" Text="{Binding Filename}"  DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Description:" Text="{Binding Description}" MinHeight="100" IsMultiline="True"/>

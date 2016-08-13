@@ -10,9 +10,23 @@ namespace UpdateCreator.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
+        private Package _package = new Package();
         public MainViewModel()
         {
-            this.PackageName = "update";
+            FileProvider.Default.FilelistChangedHandler += (sender, args) =>
+            {
+                this.OnPropertyChanged(() => this.FileList);
+            };
+            this._package.PackageNameChanged += (sender, args) =>
+            {
+                this.OnPropertyChanged(() => this.PackageFilename);
+            };
+            this._package.PackageNameChanged += (sender, args) =>
+            {
+                FileProvider.Default.PackageChanged(args.Package);
+            };
+
+            this._package.PackageName = "update";
         }
 
         #region Properties
@@ -21,13 +35,12 @@ namespace UpdateCreator.ViewModels
         {
             get
             {
-                return FileProvider.Instance.Filter;
+                return FileProvider.Default.Filter;
             }
             set
             {
-                FileProvider.Instance.Filter = value;
+                FileProvider.Default.Filter = value;
                 this.OnPropertyChanged();
-                this.OnPropertyChanged(()=> this.FileList);
             }
         }
 
@@ -35,37 +48,90 @@ namespace UpdateCreator.ViewModels
         {
             get
             {
-                return FileProvider.Instance.GetFilterFileList();
+                return FileProvider.Default.GetFilterFileList();
             }
         }
 
-        private string _packageName;
         public string PackageName
         {
-            get { return this._packageName; }
+            get { return this._package.PackageName; }
             set
             {
-                if (this._packageName != value)
+                if (this._package.PackageName != value)
                 {
-                    this._packageName = value;
-                    this.OnPropertyChanged();
-                    this.OnPropertyChanged(() => this.PackageFilename);
+                    this._package.PackageName = value;
+                }
+            }
+        }
+        public string ApplicationName
+        {
+            get { return this._package.ApplicationName; }
+            set
+            {
+                if (this._package.ApplicationName != value)
+                    {
+                        this._package.ApplicationName = value;
+                    }
+            }
+        }
+        public string Description
+        {
+            get { return this._package.Description; }
+            set
+            {
+                if (this._package.Description != value)
+                {
+                    this._package.Description = value;
                 }
             }
         }
 
-        public string ApplicationName { get; set; }
-        public string Description { get; set; }
-        public string Filename { get; set; }
-        public string LaunchArguments { get; set; }
-        public string Version { get; set; }
-        public string Url { get; set; }
+        public string Filename
+        {
+            get { return this._package.Filename; }
+            set
+            {
+                if (this._package.Filename != value)
+                {
+                    this._package.Filename = value;
+                }
+            }
+        }
+
+        public string LaunchArguments
+        {
+            get { return this._package.LaunchArguments; }
+            set
+            {
+                if (this._package.LaunchArguments != value)
+                {
+                    this._package.LaunchArguments = value;
+                }
+            }
+        }
+
+        public string Version
+        {
+            get { return this._package.Version; }
+        }
+
+        public string Url
+        {
+            get { return this._package.Url; }
+            set
+            {
+                if (this._package.Url != value)
+                {
+                    this._package.Url = value;
+                }
+            }
+        }
 
         public string PackageFilename
         {
             get
             {
-                return string.IsNullOrEmpty(this.PackageName) ? string.Empty : string.Format("{0}.zip", this.PackageName);
+                return this._package.PackageFilenameZip;
             }
         }
 
@@ -127,7 +193,9 @@ namespace UpdateCreator.ViewModels
 
         private void CreateUpdatePackage(object parameter)
         {
-            throw new System.NotImplementedException();
+            var packageBuilder = new PackageBuilder(this._package);
+            var isPackageCreated = packageBuilder.Create();
+            //this.OnPropertyChanged(()=> this.FileList);
         }
 
         private void UploadOnServer(object obj)

@@ -79,7 +79,8 @@
     <Compile Include="Models\CheckedFile.cs" />
     <Compile Include="Models\FileProvider.cs" />
     <Compile Include="Models\Generator.cs" />
-    <Compile Include="Models\UpdateXml.cs" />
+    <Compile Include="Models\PackageBuilder.cs" />
+    <Compile Include="Models\Package.cs" />
     <Compile Include="ViewModels\Commands\RelayCommand.cs" />
     <Compile Include="ViewModels\CommandViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
