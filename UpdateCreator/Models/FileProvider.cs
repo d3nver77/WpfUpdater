@@ -18,6 +18,7 @@ namespace UpdateCreator.Models
         #endregion Instance Default
 
         public event EventHandler FilelistChangedHandler = (sender, args) => { };
+        public event EventHandler<SelectedFileEventArgs> SelectedFileChangedHandler = (sender, args) => { };
 
         private readonly List<string> _excludeMaskList = new List<string>()
         {
@@ -76,6 +77,21 @@ namespace UpdateCreator.Models
                 this.FilelistChangedHandler(this, new EventArgs());
             }
         }
+
+        private CheckedFile _selectedFile;
+        public CheckedFile SelectedFile
+        {
+            get { return this._selectedFile; }
+            set
+            {
+                if (this._selectedFile != value)
+                {
+                    this._selectedFile = value;
+                    this.SelectedFileChangedHandler(this, new SelectedFileEventArgs(this._selectedFile));
+                }
+            }
+        }
+
         public List<CheckedFile> GetFileList()
         {
             var fileList = this.CreateFileList().ToList();
@@ -83,6 +99,10 @@ namespace UpdateCreator.Models
             foreach (var file in fileList)
             {
                 file.IsSelected = !Regex.IsMatch(file.Filename, pattern, RegexOptions.IgnoreCase);
+            }
+            if (this.SelectedFile != null)
+            {
+                this.SelectedFile = fileList.FirstOrDefault(f => string.Equals(f.Filename, this.SelectedFile.Filename, StringComparison.InvariantCultureIgnoreCase) && f.IsSelected);
             }
             return fileList;
         }
@@ -104,10 +124,28 @@ namespace UpdateCreator.Models
         private void CheckedFileOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
             var file = sender as CheckedFile;
-            if (file == null || !file.IsSelected)
+            if (file == null)
                 return;
+            if (!file.IsSelected)
+            {
+                if (this.SelectedFile == file)
+                {
+                    this.SelectedFile = null;
+                }
+                return;
+            }
+
             var pattern = string.Join("|", this.ExcludeRegexFileList);
             file.IsSelected = !Regex.IsMatch(file.Filename, pattern, RegexOptions.IgnoreCase);
+        }
+
+        public bool IsDragable(CheckedFile file)
+        {
+            if (file == null)
+                return false;
+            var pattern = string.Join("|", this.ExcludeRegexFileList);
+            var isDragable = !Regex.IsMatch(file.Filename, pattern, RegexOptions.IgnoreCase);
+            return isDragable;
         }
     }
 }

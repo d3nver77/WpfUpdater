@@ -79,11 +79,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\DragDropHelper.cs" />
+    <Compile Include="Helpers\DragDropManager.cs" />
     <Compile Include="Models\CheckedFile.cs" />
     <Compile Include="Models\FileProvider.cs" />
+    <Compile Include="Models\IDragable.cs" />
+    <Compile Include="Models\IFileProperties.cs" />
     <Compile Include="Models\PackageBuilder.cs" />
     <Compile Include="Models\Package.cs" />
     <Compile Include="Models\PackageEventArgs.cs" />
+    <Compile Include="Models\SelectedFileEventArgs.cs" />
     <Compile Include="ViewModels\Commands\RelayCommand.cs" />
     <Compile Include="ViewModels\CommandViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

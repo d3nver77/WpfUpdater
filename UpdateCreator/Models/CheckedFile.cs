@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace UpdateCreator.Models
 {
-    public class CheckedFile : INotifyPropertyChanged
+    public class CheckedFile : INotifyPropertyChanged, IDragable
     {
         private bool _isSelected;
 
@@ -17,10 +17,11 @@ namespace UpdateCreator.Models
                     return;
                 }
                 this._isSelected = value;
-                if (this._isSelected)
-                    this.OnPropertyChanged();
+                this.OnPropertyChanged();
             }
         }
+
+        public bool IsDragable => FileProvider.Default.IsDragable(this);
 
         public string Filename { get; set; }
         

@@ -22,10 +22,10 @@ namespace UpdateCreator.Models
             }
         }
 
-        [XmlAttribute("Application")]
-        public string ApplicationName { get; set; } = string.Empty;
+        [XmlAttribute("Product")]
+        public string ProductName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string Filename { get; set; } = string.Empty;
+        public string LaunchFile { get; set; } = string.Empty;
         public string LaunchArguments { get; set; } = string.Empty;
         public string Version { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;

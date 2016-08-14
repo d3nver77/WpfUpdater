@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using UpdateCreator.Models;
 using UpdateCreator.ViewModels.Commands;
 
 namespace UpdateCreator.ViewModels
 {
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : ViewModelBase, IFileProperties
     {
         private readonly Package _package = new Package();
 
@@ -15,6 +17,21 @@ namespace UpdateCreator.ViewModels
             FileProvider.Default.FilelistChangedHandler += (sender, args) =>
             {
                 this.OnPropertyChanged(() => this.FileList);
+            };
+            FileProvider.Default.SelectedFileChangedHandler += (sender, args) =>
+            {
+                var file = args.File;
+                if (file == null)
+                {
+                    this.Filename = string.Empty;
+                    this.LaunchArguments = string.Empty;
+                    this.Version = string.Empty;
+                    return;
+                }
+                this.Filename = file.Filename;
+                this.ProductName = Path.GetFileNameWithoutExtension(file.Filename);
+                var versionInfo = FileVersionInfo.GetVersionInfo(file.Filename);
+                this.Version = versionInfo.ProductVersion?? string.Empty;
             };
             this._package.PackageNameChanged += (sender, args) =>
             {
@@ -46,19 +63,21 @@ namespace UpdateCreator.ViewModels
                 if (this._package.PackageName != value)
                 {
                     this._package.PackageName = value;
+                    this.OnPropertyChanged();
                 }
             }
         }
 
-        public string ApplicationName
+        public string ProductName
         {
-            get { return this._package.ApplicationName; }
+            get { return this._package.ProductName; }
             set
             {
-                if (this._package.ApplicationName != value)
-                    {
-                        this._package.ApplicationName = value;
-                    }
+                if (this._package.ProductName != value)
+                {
+                    this._package.ProductName = value;
+                    this.OnPropertyChanged();
+                }
             }
         }
 
@@ -70,18 +89,20 @@ namespace UpdateCreator.ViewModels
                 if (this._package.Description != value)
                 {
                     this._package.Description = value;
+                    this.OnPropertyChanged();
                 }
             }
         }
 
         public string Filename
         {
-            get { return this._package.Filename; }
+            get { return this._package.LaunchFile; }
             set
             {
-                if (this._package.Filename != value)
+                if (this._package.LaunchFile != value)
                 {
-                    this._package.Filename = value;
+                    this._package.LaunchFile = value;
+                    this.OnPropertyChanged();
                 }
             }
         }
@@ -94,11 +115,23 @@ namespace UpdateCreator.ViewModels
                 if (this._package.LaunchArguments != value)
                 {
                     this._package.LaunchArguments = value;
+                    this.OnPropertyChanged();
                 }
             }
         }
 
-        public string Version => this._package.Version;
+        public string Version
+        {
+            get { return this._package.Version; }
+            set
+            {
+                if (this._package.Version != value)
+                {
+                    this._package.Version = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         public string Url
         {
@@ -108,6 +141,7 @@ namespace UpdateCreator.ViewModels
                 if (this._package.Url != value)
                 {
                     this._package.Url = value;
+                    this.OnPropertyChanged();
                 }
             }
         }
@@ -116,9 +150,20 @@ namespace UpdateCreator.ViewModels
 
         public string UploadPath { get; set; }
 
-        private bool IsPackageValid => !string.IsNullOrEmpty(this.ApplicationName)
+        private bool IsPackageValid => !string.IsNullOrEmpty(this.ProductName)
             && !string.IsNullOrEmpty(this.PackageName)
             && !string.IsNullOrEmpty(this.Url);
+
+        public IDragable SelectedFile
+        {
+            //get { throw new NotImplementedException(); }
+            set
+            {
+                var file = (CheckedFile) value;
+                file.IsSelected = true;
+                FileProvider.Default.SelectedFile = file;
+            }
+        }
 
         #endregion Properties
 

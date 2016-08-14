@@ -1,4 +1,11 @@
-﻿using System.Windows;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using UpdateCreator.Models;
 
 namespace UpdateCreator.Views
 {
@@ -9,7 +16,7 @@ namespace UpdateCreator.Views
     {
         public MainWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

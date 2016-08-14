@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:UpdateCreator.Views"
+        xmlns:helpers="clr-namespace:UpdateCreator.Helpers"
         mc:Ignorable="d" DataContext="{Binding MainViewModel, Mode=OneWay, Source={StaticResource Locator}}"
         Title="Update package Creator" MinHeight="500" MinWidth="750" Height="500" Width="750" 
         WindowStartupLocation="CenterScreen">
@@ -17,15 +18,16 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Column="0" Grid.IsSharedSizeScope="True" Margin="5" LastChildFill="True">
+        <DockPanel Grid.Column="0" Grid.IsSharedSizeScope="True" Margin="5" LastChildFill="True" Background="Transparent"
+                   AllowDrop="True" helpers:DragDropHelper.Target="{Binding}">
             <views:LabelTextboxUserControl Label="Package Name:" Text="{Binding PackageName}" DockPanel.Dock="Top"/>
-            <views:LabelTextboxUserControl Label="Application Name:" Text="{Binding ApplicationName}" DockPanel.Dock="Top"/>
+            <views:LabelTextboxUserControl Label="Product Name:" Text="{Binding ProductName}" DockPanel.Dock="Top"/>
             <views:LabelTextboxUserControl Label="Upload path:" Text="{Binding UploadPath}" DockPanel.Dock="Bottom"/>
             <Separator Margin="5,5,5,5" DockPanel.Dock="Bottom"/>
             <views:LabelUrlFileUserControl Label="Url:" Url="{Binding Url}" Filename="{Binding PackageFilename}" DockPanel.Dock="Bottom"/>
-            <views:LabelTextboxUserControl Label="Version:" Text="{Binding Version, Mode=OneWay}" IsReadOnly="True" DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Version:" Text="{Binding Version}" DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Launch args:" Text="{Binding LaunchArguments}" DockPanel.Dock="Bottom"/>
-            <views:LabelTextboxUserControl Label="Filename:" Text="{Binding Filename}"  DockPanel.Dock="Bottom"/>
+            <views:LabelTextboxUserControl Label="Launch file:" Text="{Binding Filename}"  DockPanel.Dock="Bottom"/>
             <views:LabelTextboxUserControl Label="Description:" Text="{Binding Description}" MinHeight="100" IsMultiline="True"/>
         </DockPanel>
         <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,5"/>
@@ -36,10 +38,13 @@
                 <views:LabelTextboxUserControl Label="Exclude mask:" Text="{Binding ExludeMasks, UpdateSourceTrigger=LostFocus}" 
                                                ToolTip="Wildcards ('*', '?') are available" />
             </DockPanel>
-            <ListView Margin="0,5,5,0" ItemsSource="{Binding FileList}" ScrollViewer.VerticalScrollBarVisibility="Visible" >
+            <ListView Margin="0,5,5,0" ItemsSource="{Binding FileList}" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                helpers:DragDropHelper.Source="{Binding}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+
+                        
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
