@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -52,7 +50,7 @@ namespace UpdateCreator.Views
 
         public LabelUrlFileUserControl()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.Loaded += (sender, args) =>
             {
                 var bindingExpressionUrl = this.GetBindingExpression(UrlProperty);

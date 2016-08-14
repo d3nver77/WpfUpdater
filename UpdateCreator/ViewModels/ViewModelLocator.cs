@@ -1,14 +1,7 @@
-﻿using UpdateCreator.Models;
-
-namespace UpdateCreator.ViewModels
+﻿namespace UpdateCreator.ViewModels
 {
     public class ViewModelLocator
     {
-        public ViewModelLocator()
-        {
-            
-        }
-
         private MainViewModel _mainViewModel;
         public MainViewModel MainViewModel
         {

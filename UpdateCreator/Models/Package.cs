@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace UpdateCreator.Models
 {
+    [Serializable]
+    [XmlRoot("Update")]
     public class Package
     {
         public event EventHandler<PackageEventArgs> PackageNameChanged = (sender, args) => { };
 
         private string _packageName;
+
+        [XmlIgnore]
         public string PackageName
         {
             get { return this._packageName; }
@@ -17,32 +22,16 @@ namespace UpdateCreator.Models
             }
         }
 
-        public string ApplicationName { get; set; }
-        public string Description { get; set; }
-        public string Filename { get; set; }
-        public string LaunchArguments { get; set; }
-        public string Version { get; set; }
-        public string Url { get; set; }
-        public string Hash { get; set; }
+        [XmlAttribute("Application")]
+        public string ApplicationName { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Filename { get; set; } = string.Empty;
+        public string LaunchArguments { get; set; } = string.Empty;
+        public string Version { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
+        public string Hash { get; set; } = string.Empty;
 
-        public string PackageFilenameZip
-        {
-            get
-            {
-                return string.IsNullOrEmpty(this.PackageName) ? string.Empty : string.Format("{0}.zip", this.PackageName);
-            }
-        }
-        public string PackageFilenameXml
-        {
-            get
-            {
-                return string.IsNullOrEmpty(this.PackageName) ? string.Empty : string.Format("{0}.xml", this.PackageName);
-            }
-        }
-
-        public Package()
-        {
-            
-        }
+        public string PackageFilenameZip => string.IsNullOrEmpty(this.PackageName) ? string.Empty : string.Format("{0}.zip", this.PackageName);
+        public string PackageFilenameXml => string.IsNullOrEmpty(this.PackageName) ? string.Empty : string.Format("{0}.xml", this.PackageName);
     }
 }

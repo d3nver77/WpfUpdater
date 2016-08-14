@@ -19,7 +19,7 @@ namespace UpdateCreator.ViewModels
         {
             if (selectorExpression == null)
             {
-                throw new ArgumentNullException("selectorExpression");
+                throw new ArgumentNullException(nameof(selectorExpression));
             }
 
             var body = selectorExpression.Body as MemberExpression;
@@ -28,7 +28,7 @@ namespace UpdateCreator.ViewModels
             {
                 throw new ArgumentException("The body must be a member expression");
             }
-
+            // ReSharper disable once ExplicitCallerInfoArgument
             this.OnPropertyChanged(body.Member.Name);
         }
         #endregion Implement INotifyPropertyChanged

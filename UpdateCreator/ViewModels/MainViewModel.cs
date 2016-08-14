@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using UpdateCreator.Models;
 using UpdateCreator.ViewModels.Commands;
@@ -10,7 +8,7 @@ namespace UpdateCreator.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private Package _package = new Package();
+        private readonly Package _package = new Package();
 
         public MainViewModel()
         {
@@ -38,10 +36,7 @@ namespace UpdateCreator.ViewModels
             set { FileProvider.Default.Filter = value; }
         }
 
-        public List<CheckedFile> FileList
-        {
-            get { return FileProvider.Default.GetFileList(); }
-        }
+        public List<CheckedFile> FileList => FileProvider.Default.GetFileList();
 
         public string PackageName
         {
@@ -103,10 +98,7 @@ namespace UpdateCreator.ViewModels
             }
         }
 
-        public string Version
-        {
-            get { return this._package.Version; }
-        }
+        public string Version => this._package.Version;
 
         public string Url
         {
@@ -120,38 +112,26 @@ namespace UpdateCreator.ViewModels
             }
         }
 
-        public string PackageFilename
-        {
-            get
-            {
-                return this._package.PackageFilenameZip;
-            }
-        }
+        public string PackageFilename => this._package.PackageFilenameZip;
 
         public string UploadPath { get; set; }
 
-        public bool IsPackageValid
-        {
-            get
-            {
-                return !string.IsNullOrEmpty(this.ApplicationName) &&
-                       !string.IsNullOrEmpty(this.PackageName) &&
-                       !string.IsNullOrEmpty(this.Url);
-            }
-        }
+        private bool IsPackageValid => !string.IsNullOrEmpty(this.ApplicationName)
+            && !string.IsNullOrEmpty(this.PackageName)
+            && !string.IsNullOrEmpty(this.Url);
 
         #endregion Properties
 
         #region Commands
 
-        private CommandViewModel _createUpdatePackageCommand = null;
+        private CommandViewModel _createUpdatePackageCommand;
         public CommandViewModel CreateUpdatePackageCommand
         {
             get { return this._createUpdatePackageCommand 
                     ?? (this._createUpdatePackageCommand = new CommandViewModel("Create update package", new RelayCommand(this.CreateUpdatePackage, p => this.IsPackageValid))); }
         }
 
-        private CommandViewModel _uploadOnServerCommand = null;
+        private CommandViewModel _uploadOnServerCommand;
         public CommandViewModel UploadOnServerCommand
         {
             get
@@ -162,7 +142,7 @@ namespace UpdateCreator.ViewModels
             }
         }
 
-        private CommandViewModel _closeCommand = null;
+        private CommandViewModel _closeCommand;
         public CommandViewModel CloseCommand
         {
             get
@@ -172,7 +152,7 @@ namespace UpdateCreator.ViewModels
             }
         }
 
-        private CommandViewModel _updateFilelistCommand = null;
+        private CommandViewModel _updateFilelistCommand;
         public CommandViewModel UpdateFilelistCommand
         {
             get
@@ -187,13 +167,21 @@ namespace UpdateCreator.ViewModels
         private void CreateUpdatePackage(object parameter)
         {
             var packageBuilder = new PackageBuilder(this._package);
-            var isPackageCreated = packageBuilder.Create();
+            try
+            {
+                packageBuilder.Create();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error creating package update.", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            
             this.OnPropertyChanged(()=> this.FileList);
         }
 
         private void UploadOnServer(object obj)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private void Close(object obj)

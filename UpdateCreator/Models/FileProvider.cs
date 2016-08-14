@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using UpdateCreator.ViewModels;
 
 namespace UpdateCreator.Models
 {
@@ -15,10 +13,7 @@ namespace UpdateCreator.Models
         #region Instance Default
 
         private static FileProvider _instance;
-        public static FileProvider Default
-        {
-            get { return _instance ?? (_instance = new FileProvider()); }
-        }
+        public static FileProvider Default => _instance ?? (_instance = new FileProvider());
 
         #endregion Instance Default
 
@@ -31,13 +26,12 @@ namespace UpdateCreator.Models
             "*.config"
         };
 
-        private List<string> ExcludeRegexMaskList
+        private IEnumerable<string> ExcludeRegexMaskList
         {
             get
             {
                 var excludeRegexMaskList = this._excludeMaskList
-                    .Select(m => string.Format("^{0}$", Regex.Escape(m).Replace(@"\*", ".*").Replace(@"\?", ".{1}")))
-                    .ToList();
+                    .Select(m => $"^{Regex.Escape(m).Replace(@"\*", ".*").Replace(@"\?", ".{1}")}$");
                 return excludeRegexMaskList;
             }
         }
@@ -46,21 +40,20 @@ namespace UpdateCreator.Models
         {
             get
             {
-                var excludeRegexFileList = new List<string>();
-                excludeRegexFileList.Add(string.Format("^{0}$", Regex.Escape(this.CurrentAssemblyMaskFilename).Replace(@"\*", ".*").Replace(@"\?", ".{1}")));
+                var excludeRegexFileList = new List<string>
+                {
+                    $"^{Regex.Escape(this.CurrentAssemblyMaskFilename).Replace(@"\*", ".*").Replace(@"\?", ".{1}")}$"
+                };
                 if (this._package != null)
                 {
-                    excludeRegexFileList.Add(string.Format("^{0}$", Regex.Escape(this._package.PackageFilenameZip).Replace(@"\*", ".*").Replace(@"\?", ".{1}")));
-                    excludeRegexFileList.Add(string.Format("^{0}$", Regex.Escape(this._package.PackageFilenameXml).Replace(@"\*", ".*").Replace(@"\?", ".{1}")));
+                    excludeRegexFileList.Add($"^{Regex.Escape(this._package.PackageFilenameZip).Replace(@"\*", ".*").Replace(@"\?", ".{1}")}$");
+                    excludeRegexFileList.Add($"^{Regex.Escape(this._package.PackageFilenameXml).Replace(@"\*", ".*").Replace(@"\?", ".{1}")}$");
                 }
                 return excludeRegexFileList;
             }
         }
 
-        private string CurrentAssemblyMaskFilename
-        {
-            get { return Assembly.GetEntryAssembly().GetName().Name + ".*"; }
-        }
+        private string CurrentAssemblyMaskFilename => Assembly.GetEntryAssembly().GetName().Name + ".*";
 
         private Package _package;
         public void PackageChanged(Package package)
@@ -69,10 +62,7 @@ namespace UpdateCreator.Models
             this.FilelistChangedHandler(this, new EventArgs());
         }
 
-        private string CurrentDirectory
-        {
-            get { return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location); }
-        }
+        private string CurrentDirectory => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
         public string Filter
         {
