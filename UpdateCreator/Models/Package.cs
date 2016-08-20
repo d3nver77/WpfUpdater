@@ -7,7 +7,7 @@ namespace UpdateCreator.Models
     [XmlRoot("Update")]
     public class Package
     {
-        public event EventHandler<PackageEventArgs> PackageNameChanged = (sender, args) => { };
+        public event EventHandler<PackageNameEventArgs> PackageNameChanged = (sender, args) => { };
 
         private string _packageName;
 
@@ -18,7 +18,7 @@ namespace UpdateCreator.Models
             set
             {
                 this._packageName = value;
-                this.PackageNameChanged(this, new PackageEventArgs(this));
+                this.PackageNameChanged(this, new PackageNameEventArgs(this));
             }
         }
 

@@ -42,18 +42,33 @@ namespace UpdateCreator.ViewModels
                 FileProvider.Default.PackageChanged(args.Package);
             };
 
+            PackageBuilderBase.PackProgressChanged += (sender, args) =>
+            {
+                this.ProgressValue = args.Percent;
+                this.FileNameArchive = args.FileName;
+                this.OnPropertyChanged(()=> this.ProgressValue);
+                this.OnPropertyChanged(()=> this.FileNameArchive);
+            };
+
+            PackageBuilderBase.PackCompleted += (sender, args) =>
+            {
+                MessageBox.Show("Update created!");
+                this.OnPropertyChanged(() => this.FileList);
+            };
+
             this._package.PackageName = "update";
+            //this.ProgressValue = 75;
         }
 
         #region Properties
-
+        public bool IsCreating { get; set; }
         public string ExludeMasks
         {
             get { return FileProvider.Default.Filter; }
             set { FileProvider.Default.Filter = value; }
         }
 
-        public List<CheckedFile> FileList => FileProvider.Default.GetFileList();
+        public List<CheckedFile> FileList => FileProvider.Default.GetFileList(isCreateNewFileList: true);
 
         public string PackageName
         {
@@ -65,6 +80,19 @@ namespace UpdateCreator.ViewModels
                     this._package.PackageName = value;
                     this.OnPropertyChanged();
                 }
+            }
+        }
+
+        public string FileNameArchive { get; set; }
+
+        private double _progressValue;
+        public double ProgressValue
+        {
+            get { return this._progressValue; }
+            set
+            {
+                this._progressValue = value;
+                //this.OnPropertyChanged();
             }
         }
 
@@ -198,6 +226,7 @@ namespace UpdateCreator.ViewModels
         }
 
         private CommandViewModel _updateFilelistCommand;
+
         public CommandViewModel UpdateFilelistCommand
         {
             get
@@ -212,6 +241,7 @@ namespace UpdateCreator.ViewModels
         private void CreateUpdatePackage(object parameter)
         {
             var packageBuilder = new PackageBuilder(this._package);
+            IsCreating = true;
             try
             {
                 packageBuilder.Create();
@@ -220,8 +250,6 @@ namespace UpdateCreator.ViewModels
             {
                 MessageBox.Show(ex.Message, "Error creating package update.", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            
-            this.OnPropertyChanged(()=> this.FileList);
         }
 
         private void UploadOnServer(object obj)

@@ -1,123 +1,92 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using IonicZip = Ionic.Zip;
 
 namespace UpdateCreator.Models
 {
-    public class PackageBuilder
+    public class PackageBuilder : PackageBuilderBase
     {
-        private readonly Package _package;
+        private BackgroundWorker _backgroundWorker;
 
-        public PackageBuilder(Package package)
+        public PackageBuilder(Package package) : base(package)
         {
-            this._package = package;
+            this._backgroundWorker = new BackgroundWorker
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            this._backgroundWorker.DoWork += this.PackFileZipDoWork;
+            this._backgroundWorker.ProgressChanged += this.PackFileZipProgressChanged;
+            this._backgroundWorker.RunWorkerCompleted += this.PackFileZipComplete;
         }
 
-        private IEnumerable<string> FileList { get; } = FileProvider.Default.GetFileList().Where(f => f.IsSelected).Select(f => f.Filename);
-
-        public void Create()
+        protected override void CreatePackageFileZip()
         {
-            if (this._package == null)
-            {
-                throw new Exception("Package can't be null!");
-            }
-            this.CreatePackage();
+            this._backgroundWorker.RunWorkerAsync();
         }
 
-        private void CreatePackage()
+        protected override void OnCancel()
         {
-            try
-            {
-                this.RemovePackageFiles();
-                this.CreatePackageFileZip();
-                this.CreatePackageFileXml();
-            }
-            catch (Exception)
-            {
-                this.RemovePackageFiles();
-                throw;
-            }
+            this._backgroundWorker.CancelAsync();
         }
 
-        private void RemovePackageFiles()
+        private void PackFileZipDoWork(object sender, DoWorkEventArgs args)
         {
-            if (File.Exists(this._package.PackageFilenameZip))
-            {
-                File.Delete(this._package.PackageFilenameZip);
-            }
-            this._package.Hash = string.Empty;
-            if (File.Exists(this._package.PackageFilenameXml))
-            {
-                File.Delete(this._package.PackageFilenameXml);
-            }
-        }
-
-        private void CreatePackageFileZip()
-        {
-            using (var archive = ZipFile.Open(this._package.PackageFilenameZip, ZipArchiveMode.Create))
+            var filesNumber = this.FileList.Count();
+            var count = 0;
+            this._backgroundWorker.ReportProgress(0, string.Empty);
+            using (var archive = ZipFile.Open(this.Package.PackageFilenameZip, ZipArchiveMode.Create))
             {
                 foreach (var fileName in this.FileList)
                 {
+                    if (this._backgroundWorker.CancellationPending)
+                    {
+                        args.Cancel = true;
+                        break;
+                    }
                     archive.CreateEntryFromFile(fileName, fileName, CompressionLevel.Optimal);
+                    var percent = (int)Math.Round((double)++count / filesNumber * 100.0, 0);
+                    this._backgroundWorker.ReportProgress(percent, fileName);
+                    Thread.Sleep(500);
                 }
             }
-            this._package.Hash = this.GetHashPackageZip();
+        }
+        
+        private void PackFileZipProgressChanged(object sender, ProgressChangedEventArgs args)
+        {
+            var filename = args.UserState.ToString();
+            if (args.ProgressPercentage == 0 && string.IsNullOrEmpty(filename))
+            {
+                OnPackProgressChanged(this, new ProgressEventArgs(filename, args.ProgressPercentage, ProgressStatus.Started));
+            }
+            OnPackProgressChanged(this, new ProgressEventArgs(filename, args.ProgressPercentage, ProgressStatus.Running));
         }
 
-        private void CreatePackageFileXml()
+        private void PackFileZipComplete(object sender, RunWorkerCompletedEventArgs args)
         {
-            string packageXml;
-
-            var serializer = new XmlSerializer(typeof(Package));
-
-            var settings = new XmlWriterSettings
+            if (args.Cancelled)
             {
-                Encoding = new UnicodeEncoding(false, false),
-                Indent = true,
-                OmitXmlDeclaration = false
-            };
-
-            using (var textWriter = new Utf8StringWriter())
-            {
-                using (var xmlWriter = XmlWriter.Create(textWriter, settings))
-                {
-                    var namespaces = new XmlSerializerNamespaces();
-                    namespaces.Add(string.Empty, string.Empty);
-                    serializer.Serialize(xmlWriter, this._package, namespaces);
-                }
-                packageXml = textWriter.ToString();
+                this.OnCanceled();
+                OnPackCompleted(this, new ProgressEventArgs(string.Empty, 0, ProgressStatus.Canceled));
+                return;
             }
-
-            File.WriteAllText(this._package.PackageFilenameXml, packageXml);
-        }
-
-        private string GetHashPackageZip()
-        {
-            var sb = new StringBuilder();
-            if (!File.Exists(this._package.PackageFilenameZip))
+            if (args.Error != null)
             {
-                return sb.ToString();
+                this.OnCanceled();
+                OnPackCompleted(this, new ProgressEventArgs(args.Error.Message, 0, ProgressStatus.Error));
+                return;
             }
-            using (var stream = new FileStream(this._package.PackageFilenameZip, FileMode.Open))
-            {
-                var hash = MD5.Create().ComputeHash(stream);
-                foreach (var b in hash)
-                {
-                    sb.Append(b.ToString("x2").ToLower());
-                }
-            }
-            return sb.ToString();
-        }
-
-        private class Utf8StringWriter : StringWriter
-        {
-            public override Encoding Encoding => new UTF8Encoding();
+            OnPackCompleted(this, new ProgressEventArgs(string.Empty, 100, ProgressStatus.Completed));
         }
     }
 }

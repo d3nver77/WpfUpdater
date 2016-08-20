@@ -92,19 +92,24 @@ namespace UpdateCreator.Models
             }
         }
 
-        public List<CheckedFile> GetFileList()
+        private List<CheckedFile> _fileList;
+        public List<CheckedFile> GetFileList(bool isCreateNewFileList = false)
         {
-            var fileList = this.CreateFileList().ToList();
+            if (this._fileList != null && !isCreateNewFileList)
+            {
+                return this._fileList;
+            }
+            this._fileList = this.CreateFileList().ToList();
             var pattern = string.Join("|", this.ExcludeRegexMaskList);
-            foreach (var file in fileList)
+            foreach (var file in this._fileList)
             {
                 file.IsSelected = !Regex.IsMatch(file.Filename, pattern, RegexOptions.IgnoreCase);
             }
             if (this.SelectedFile != null)
             {
-                this.SelectedFile = fileList.FirstOrDefault(f => string.Equals(f.Filename, this.SelectedFile.Filename, StringComparison.InvariantCultureIgnoreCase) && f.IsSelected);
+                this.SelectedFile = this._fileList.FirstOrDefault(f => string.Equals(f.Filename, this.SelectedFile.Filename, StringComparison.InvariantCultureIgnoreCase) && f.IsSelected);
             }
-            return fileList;
+            return this._fileList;
         }
 
         private IEnumerable<CheckedFile> CreateFileList()
