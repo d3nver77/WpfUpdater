@@ -18,46 +18,59 @@ namespace UpdateCreator.ViewModels
             {
                 this.OnPropertyChanged(() => this.FileList);
             };
-            FileProvider.Default.SelectedFileChangedHandler += (sender, args) =>
-            {
-                var file = args.File;
-                if (file == null)
-                {
-                    this.Filename = string.Empty;
-                    this.LaunchArguments = string.Empty;
-                    this.Version = string.Empty;
-                    return;
-                }
-                this.Filename = file.Filename;
-                this.ProductName = Path.GetFileNameWithoutExtension(file.Filename);
-                var versionInfo = FileVersionInfo.GetVersionInfo(file.Filename);
-                this.Version = versionInfo.ProductVersion?? string.Empty;
-            };
+            FileProvider.Default.SelectedFileChangedHandler += this.OnSelectedFileChangedHandler;
+
             this._package.PackageNameChanged += (sender, args) =>
             {
                 this.OnPropertyChanged(() => this.PackageFilename);
-            };
-            this._package.PackageNameChanged += (sender, args) =>
-            {
                 FileProvider.Default.PackageChanged(args.Package);
             };
 
-            PackageBuilderBase.PackProgressChanged += (sender, args) =>
-            {
-                this.ProgressValue = args.Percent;
-                this.FileNameArchive = args.FileName;
-                this.OnPropertyChanged(()=> this.ProgressValue);
-                this.OnPropertyChanged(()=> this.FileNameArchive);
-            };
+            PackageBuilder.PackProgressChanged += this.OnPackProgressChanged;
 
-            PackageBuilderBase.PackCompleted += (sender, args) =>
-            {
-                MessageBox.Show("Update created!");
-                this.OnPropertyChanged(() => this.FileList);
-            };
+            PackageBuilder.PackCompleted += this.OnPackCompleted;
 
             this._package.PackageName = "update";
-            //this.ProgressValue = 75;
+        }
+
+        private void OnSelectedFileChangedHandler(object sender, SelectedFileEventArgs args)
+        {
+            var file = args.File;
+            if (file == null)
+            {
+                this.Filename = string.Empty;
+                this.LaunchArguments = string.Empty;
+                this.Version = string.Empty;
+                return;
+            }
+            this.Filename = file.Filename;
+            this.ProductName = Path.GetFileNameWithoutExtension(file.Filename);
+            var versionInfo = FileVersionInfo.GetVersionInfo(file.Filename);
+            this.Version = versionInfo.ProductVersion ?? string.Empty;
+        }
+
+        private void OnPackProgressChanged(object sender, ProgressEventArgs args)
+        {
+            this.ProgressValue = args.Percent;
+            this.FileNameArchive = args.FileName;
+        }
+
+        private void OnPackCompleted(object sender, ProgressEventArgs args)
+        {
+            if (args.Status == ProgressStatus.Completed)
+            {
+                this.FileNameArchive = args.FileName;
+                MessageBox.Show("Update created!", "Update complete");
+            }
+            if (args.Status == ProgressStatus.Error)
+            {
+                MessageBox.Show(args.Message, "Error creating package update", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            if (args.Status == ProgressStatus.Canceled)
+            {
+                MessageBox.Show("Canceled package update", "Update canceled", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            FileProvider.Default.Update();
         }
 
         #region Properties
@@ -68,7 +81,7 @@ namespace UpdateCreator.ViewModels
             set { FileProvider.Default.Filter = value; }
         }
 
-        public List<CheckedFile> FileList => FileProvider.Default.GetFileList(isCreateNewFileList: true);
+        public List<CheckedFile> FileList => FileProvider.Default.GetFileList();
 
         public string PackageName
         {
@@ -83,7 +96,18 @@ namespace UpdateCreator.ViewModels
             }
         }
 
-        public string FileNameArchive { get; set; }
+        public string FileNameArchive
+        {
+            get { return this._fileNameArchive; }
+            set
+            {
+                if (this._fileNameArchive != value)
+                {
+                    this._fileNameArchive = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private double _progressValue;
         public double ProgressValue
@@ -91,8 +115,11 @@ namespace UpdateCreator.ViewModels
             get { return this._progressValue; }
             set
             {
-                this._progressValue = value;
-                //this.OnPropertyChanged();
+                if (this._progressValue != value)
+                {
+                    this._progressValue = value;
+                    this.OnPropertyChanged();
+                }
             }
         }
 
@@ -226,6 +253,7 @@ namespace UpdateCreator.ViewModels
         }
 
         private CommandViewModel _updateFilelistCommand;
+        private string _fileNameArchive;
 
         public CommandViewModel UpdateFilelistCommand
         {
@@ -241,15 +269,8 @@ namespace UpdateCreator.ViewModels
         private void CreateUpdatePackage(object parameter)
         {
             var packageBuilder = new PackageBuilder(this._package);
-            IsCreating = true;
-            try
-            {
-                packageBuilder.Create();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error creating package update.", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            //this.IsCreating = true;
+            packageBuilder.Create();
         }
 
         private void UploadOnServer(object obj)
@@ -264,7 +285,7 @@ namespace UpdateCreator.ViewModels
 
         private void UpdateFileList(object obj)
         {
-            this.OnPropertyChanged(()=> this.FileList);
+            FileProvider.Default.Update();
         }
     }
 }

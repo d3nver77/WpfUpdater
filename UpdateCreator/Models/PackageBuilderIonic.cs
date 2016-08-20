@@ -32,11 +32,11 @@ namespace UpdateCreator.Models
                             var percentage = (int)(1.0d / args.TotalBytesToTransfer * args.BytesTransferred * 100.0d);
                             // report your progress
                             var name = args.CurrentEntry != null ? args.CurrentEntry.FileName : string.Empty;
-                            OnPackProgressChanged(this, new ProgressEventArgs(name, percentage, ProgressStatus.Running));
+                            //OnPackProgressChanged(this, new ProgressEventArgs(name, percentage, ProgressStatus.Running));
                             //Thread.Sleep(500);
                         };
                     zipFile.Save();
-                    OnPackProgressChanged(this, new ProgressEventArgs(string.Empty, 100, ProgressStatus.Completed));
+                    //OnPackProgressChanged(this, new ProgressEventArgs(string.Empty, 100, ProgressStatus.Completed));
                 }
             });
         }

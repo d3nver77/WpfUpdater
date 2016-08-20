@@ -15,12 +15,18 @@ namespace UpdateCreator.Models
         public string FileName { get; }
         public int Percent { get; }
         public ProgressStatus Status { get; }
+        public string Message { get; }
 
-        public ProgressEventArgs(string filename, int percent, ProgressStatus status)
+        public ProgressEventArgs(string filename, int percent, ProgressStatus status = ProgressStatus.Running) : this(filename, percent, status, string.Empty)
+        {
+        }
+
+        public ProgressEventArgs(string filename, int percent, ProgressStatus status, string message)
         {
             this.FileName = filename;
             this.Percent = percent;
             this.Status = status;
+            this.Message = message;
         }
     }
 }

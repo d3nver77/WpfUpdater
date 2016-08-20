@@ -93,9 +93,9 @@ namespace UpdateCreator.Models
         }
 
         private List<CheckedFile> _fileList;
-        public List<CheckedFile> GetFileList(bool isCreateNewFileList = false)
+        public List<CheckedFile> GetFileList()
         {
-            if (this._fileList != null && !isCreateNewFileList)
+            if (this._fileList != null)
             {
                 return this._fileList;
             }
@@ -124,6 +124,12 @@ namespace UpdateCreator.Models
                     return checkedFile;
                 });
             return fileList;
+        }
+
+        public void Update()
+        {
+            this._fileList = null;
+            this.FilelistChangedHandler(this, new EventArgs());
         }
 
         private void CheckedFileOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
