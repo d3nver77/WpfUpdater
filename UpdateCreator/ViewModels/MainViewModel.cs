@@ -268,7 +268,7 @@ namespace UpdateCreator.ViewModels
 
         private void CreateUpdatePackage(object parameter)
         {
-            var packageBuilder = new PackageBuilder(this._package);
+            var packageBuilder = new PackageBuilderIonic(this._package);
             //this.IsCreating = true;
             packageBuilder.Create();
         }

@@ -17,7 +17,7 @@ namespace UpdateCreator.Models
     {
         protected readonly CancellationTokenSource CancellationTokenSource;
         protected readonly IProgress<ProgressEventArgs> Progress;
-        protected int Percent;
+        protected int Percentage;
         protected string CurrentFileName = string.Empty;
 
         protected Package Package { get; }
@@ -37,7 +37,7 @@ namespace UpdateCreator.Models
 
         public void Create()
         {
-            this.Percent = 0;
+            this.Percentage = 0;
             this.RemovePackageFiles();
             this.OnCreatePackage();
         }
@@ -59,20 +59,20 @@ namespace UpdateCreator.Models
             catch (OperationCanceledException ex)
             {
                 this.RemovePackageFiles();
-                PackCompleted(this, new ProgressEventArgs(this.CurrentFileName, this.Percent, ProgressStatus.Canceled));
+                PackCompleted(this, new ProgressEventArgs(this.CurrentFileName, this.Percentage, ProgressStatus.Canceled));
                 return;
             }
             catch (Exception ex)
             {
                 this.RemovePackageFiles();
-                PackCompleted(this, new ProgressEventArgs(this.CurrentFileName, this.Percent, ProgressStatus.Error, ex.Message));
+                PackCompleted(this, new ProgressEventArgs(this.CurrentFileName, this.Percentage, ProgressStatus.Error, ex.Message));
                 return;
             }
 
             this.CurrentFileName = string.Empty;
             this.Package.Hash = this.GetPackageZipHash();
             this.CreatePackageFileXml();
-            PackCompleted(this, new ProgressEventArgs(this.CurrentFileName, this.Percent, ProgressStatus.Completed));
+            PackCompleted(this, new ProgressEventArgs(this.CurrentFileName, this.Percentage, ProgressStatus.Completed));
         }
 
         private void RemovePackageFiles()
@@ -90,7 +90,7 @@ namespace UpdateCreator.Models
         protected virtual void CreatePackageFileZip()
         {
             var count = 0;
-            this.Progress.Report(new ProgressEventArgs(this.CurrentFileName, this.Percent, ProgressStatus.Started));
+            this.Progress.Report(new ProgressEventArgs(this.CurrentFileName, this.Percentage, ProgressStatus.Started));
             using (var archive = ZipFile.Open(this.Package.PackageFilenameZip, ZipArchiveMode.Create))
             {
                 foreach (var fileName in this.FileList)
@@ -98,8 +98,8 @@ namespace UpdateCreator.Models
                     this.CurrentFileName = fileName;
                     this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
                     archive.CreateEntryFromFile(this.CurrentFileName, this.CurrentFileName, CompressionLevel.Optimal);
-                    this.Percent = (int)Math.Round((double)++count / this.FileList.Count() * 100.0, 0);
-                    this.Progress.Report(new ProgressEventArgs(this.CurrentFileName, this.Percent));
+                    this.Percentage = (int)Math.Round((double)++count / this.FileList.Count() * 100.0, 0);
+                    this.Progress.Report(new ProgressEventArgs(this.CurrentFileName, this.Percentage));
                     Thread.Sleep(200);
                 }
             }

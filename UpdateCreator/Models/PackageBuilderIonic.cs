@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Ionic.Zip;
 
@@ -10,35 +11,26 @@ namespace UpdateCreator.Models
         {
             
         }
-        protected override async void CreatePackageFileZip()
+        protected override void CreatePackageFileZip()
         {
-            await Task.Run(() =>
+            var count = 0;
+            this.Progress.Report(new ProgressEventArgs(this.CurrentFileName, this.Percentage, ProgressStatus.Started));
+            using (var zipFile = new ZipFile(this.Package.PackageFilenameZip, Encoding.UTF8))
             {
-                using (var zipFile = new ZipFile(this.Package.PackageFilenameZip))
-                {
-                    // add content to zip here 
-                    
-                    //zipFile.AddProgress += (sender, args) =>
-                    //{
-                    //    var percentage = (int)(1.0d / args.TotalBytesToTransfer * args.BytesTransferred * 100.0d);
-                    //    // report your progress
-                    //    PackProgressChanged(this, new ProgressEventArgs(args.CurrentEntry.FileName, percentage));
-                    //    Thread.Sleep(500);
-                    //};
-                    zipFile.AddFiles(this.FileList);
-                    zipFile.SaveProgress +=
-                        (o, args) =>
-                        {
-                            var percentage = (int)(1.0d / args.TotalBytesToTransfer * args.BytesTransferred * 100.0d);
-                            // report your progress
-                            var name = args.CurrentEntry != null ? args.CurrentEntry.FileName : string.Empty;
-                            //OnPackProgressChanged(this, new ProgressEventArgs(name, percentage, ProgressStatus.Running));
-                            //Thread.Sleep(500);
-                        };
-                    zipFile.Save();
-                    //OnPackProgressChanged(this, new ProgressEventArgs(string.Empty, 100, ProgressStatus.Completed));
-                }
-            });
+                // add content to zip here 
+                zipFile.AddFiles(this.FileList);
+
+                zipFile.SaveProgress +=
+                    (o, args) =>
+                    {
+                        this.Percentage = (int) (1.0d/args.TotalBytesToTransfer*args.BytesTransferred*100.0d);
+                        // report your progress
+                        this.CurrentFileName = args.CurrentEntry != null ? args.CurrentEntry.FileName : string.Empty;
+                        this.Progress.Report(new ProgressEventArgs(this.CurrentFileName, this.Percentage, ProgressStatus.Started));
+                        //Thread.Sleep(200);
+                    };
+                zipFile.Save();
+            }
         }
     }
 }
