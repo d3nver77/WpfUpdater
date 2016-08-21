@@ -20,7 +20,6 @@ namespace UpdateCreator.Models
         protected readonly IProgress<ProgressEventArgs> Progress;
         protected int Percentage;
         protected string CurrentFileName = string.Empty;
-        protected readonly PauseTokenSource PauseTokenSource;
         protected static readonly ManualResetEvent ManualResetEvent = new ManualResetEvent(true);
 
 
@@ -31,7 +30,6 @@ namespace UpdateCreator.Models
         {
             this.Package = package;
             this.CancellationTokenSource = new CancellationTokenSource();
-            this.PauseTokenSource = new PauseTokenSource();
             this.Progress = new Progress<ProgressEventArgs>();
             ((Progress<ProgressEventArgs>) this.Progress).ProgressChanged += PackProgressChanged;
         }
@@ -67,29 +65,11 @@ namespace UpdateCreator.Models
                 }
             }
         }
-
-        public void Pause()
-        {
-
-            ManualResetEvent.Reset();
-            //this.PauseTokenSource.IsPaused = true;
-            //_isPause = true;
-            //SomeMethodAsync(this.PauseTokenSource.Token).Wait();
-        }
-        public void Resume()
-        {
-            ManualResetEvent.Set();
-            //this.PauseTokenSource.IsPaused = false;
-            //_isPause = false;
-            //SomeMethodAsync(this.PauseTokenSource.Token).Wait();
-        }
-
+        
         private async void OnCreatePackage()
         {
             try
             {
-                //await CreatePackageFileZip();
-
                 await Task.Run(() =>
                 {
                     this.CreatePackageFileZip();
@@ -143,30 +123,6 @@ namespace UpdateCreator.Models
                 }
             }
         }
-
-        private Task myPause()
-        {
-            return Task.Delay(100);
-        }
-
-        //private async void myPause()
-        //{
-        //    while (this._isPause)
-        //    {
-        //        await Task.Delay(100);
-        //    }
-        //}
-
-        public static async Task SomeMethodAsync(PauseToken pause)
-        {
-            for (var i = 0; i < 100; i++)
-            {
-                Debug.WriteLine(i);
-                await Task.Delay(100);
-                await pause.WaitWhilePausedAsync();
-            }
-        }
-
 
         private void CreatePackageFileXml()
         {

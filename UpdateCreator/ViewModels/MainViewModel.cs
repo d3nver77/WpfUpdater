@@ -308,7 +308,6 @@ namespace UpdateCreator.ViewModels
             this._packageBuilder.Create();
         }
 
-        private bool _isPaused;
         private void AbortUpdatePackage(object obj)
         {
             this._packageBuilder.IsPause = true;

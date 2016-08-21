@@ -4,7 +4,7 @@ namespace UpdateCreator.Models
 {
     public class SelectedFileEventArgs : EventArgs
     {
-        public CheckedFile File { get; set; }
+        public CheckedFile File { get; }
 
         public SelectedFileEventArgs(CheckedFile file)
         {
