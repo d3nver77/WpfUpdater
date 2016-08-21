@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Input;
 using UpdateCreator.Models;
 using UpdateCreator.ViewModels.Commands;
 
@@ -56,6 +57,7 @@ namespace UpdateCreator.ViewModels
             this.ProductName = Path.GetFileNameWithoutExtension(file.Filename);
             var versionInfo = FileVersionInfo.GetVersionInfo(file.Filename);
             this.Version = versionInfo.ProductVersion ?? string.Empty;
+            CommandManager.InvalidateRequerySuggested();
         }
 
         private void OnPackProgressChanged(object sender, ProgressEventArgs args)
@@ -70,10 +72,13 @@ namespace UpdateCreator.ViewModels
             {
                 this.ProgressFileName = args.FileName;
                 MessageBox.Show("Update created!", "Update complete");
+                this.ProgressValue = 0;
             }
             if (args.Status == ProgressStatus.Error)
             {
                 MessageBox.Show(args.Message, "Error creating package update", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.ProgressFileName = args.FileName;
+                this.ProgressValue = 0;
             }
             if (args.Status == ProgressStatus.Canceled)
             {
@@ -145,9 +150,12 @@ namespace UpdateCreator.ViewModels
                 {
                     this._progressValue = value;
                     this.OnPropertyChanged();
+                    this.OnPropertyChanged(() => this.ProgressPercentValue);
                 }
             }
         }
+
+        public string ProgressPercentValue => $"{(Math.Abs(this.ProgressValue) < double.Epsilon ? string.Empty : this.ProgressValue + "%")}";
 
         public string ProductName
         {
