@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Update Product="SomeAppWithUpdate">
-  <Description />
-  <LaunchFile>SomeAppWithUpdate.exe</LaunchFile>
-  <LaunchArguments />
-  <Version>1.2.3.4</Version>
-  <Url>2</Url>
-  <Hash>e953c43db401f5d8ebd753998b98cfe5</Hash>
-</Update>

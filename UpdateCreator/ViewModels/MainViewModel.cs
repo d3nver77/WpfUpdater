@@ -10,10 +10,19 @@ namespace UpdateCreator.ViewModels
 {
     public class MainViewModel : ViewModelBase, IFileProperties
     {
+        #region Fields
         private readonly Package _package = new Package();
+        private string _progressFileName;
+        private bool _isEnabled;
+        private PackageBuilder _packageBuilder;
+        #endregion Fields
 
         public MainViewModel()
         {
+            this._createUpdatePackageCommand = new CommandViewModel("Create update package", new RelayCommand(this.CreateUpdatePackage, p => this.IsPackageValid));
+            this._abortUpdatePackageCommand = new CommandViewModel("Abort update package", new RelayCommand(this.AbortUpdatePackage));
+            this.UpdatePackageCommand = this._createUpdatePackageCommand;
+
             FileProvider.Default.FilelistChangedHandler += (sender, args) =>
             {
                 this.OnPropertyChanged(() => this.FileList);
@@ -29,7 +38,7 @@ namespace UpdateCreator.ViewModels
             PackageBuilder.PackProgressChanged += this.OnPackProgressChanged;
 
             PackageBuilder.PackCompleted += this.OnPackCompleted;
-
+            this.IsEnabled = true;
             this._package.PackageName = "update";
         }
 
@@ -52,14 +61,14 @@ namespace UpdateCreator.ViewModels
         private void OnPackProgressChanged(object sender, ProgressEventArgs args)
         {
             this.ProgressValue = args.Percent;
-            this.FileNameArchive = args.FileName;
+            this.ProgressFileName = args.FileName;
         }
 
         private void OnPackCompleted(object sender, ProgressEventArgs args)
         {
             if (args.Status == ProgressStatus.Completed)
             {
-                this.FileNameArchive = args.FileName;
+                this.ProgressFileName = args.FileName;
                 MessageBox.Show("Update created!", "Update complete");
             }
             if (args.Status == ProgressStatus.Error)
@@ -68,13 +77,28 @@ namespace UpdateCreator.ViewModels
             }
             if (args.Status == ProgressStatus.Canceled)
             {
-                MessageBox.Show("Canceled package update", "Update canceled", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Package update is canceled.", "Update canceled", MessageBoxButton.OK, MessageBoxImage.Information);
+                this.ProgressValue = 0;
+                this.ProgressFileName = string.Empty;
             }
             FileProvider.Default.Update();
         }
 
         #region Properties
-        public bool IsCreating { get; set; }
+
+        public bool IsEnabled
+        {
+            get { return this._isEnabled; }
+            set
+            {
+                if (this._isEnabled != value)
+                {
+                    this._isEnabled = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         public string ExludeMasks
         {
             get { return FileProvider.Default.Filter; }
@@ -96,14 +120,14 @@ namespace UpdateCreator.ViewModels
             }
         }
 
-        public string FileNameArchive
+        public string ProgressFileName
         {
-            get { return this._fileNameArchive; }
+            get { return this._progressFileName; }
             set
             {
-                if (this._fileNameArchive != value)
+                if (this._progressFileName != value)
                 {
-                    this._fileNameArchive = value;
+                    this._progressFileName = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -224,13 +248,22 @@ namespace UpdateCreator.ViewModels
 
         #region Commands
 
-        private CommandViewModel _createUpdatePackageCommand;
-        public CommandViewModel CreateUpdatePackageCommand
+        private readonly CommandViewModel _createUpdatePackageCommand;
+        private readonly CommandViewModel _abortUpdatePackageCommand;
+        private CommandViewModel _updatePackageCommand;
+        public CommandViewModel UpdatePackageCommand
         {
-            get { return this._createUpdatePackageCommand 
-                    ?? (this._createUpdatePackageCommand = new CommandViewModel("Create update package", new RelayCommand(this.CreateUpdatePackage, p => this.IsPackageValid))); }
+            get { return this._updatePackageCommand; }
+            set
+            {
+                if (this._updatePackageCommand != value)
+                {
+                    this._updatePackageCommand = value;
+                    this.OnPropertyChanged();
+                }
+            }
         }
-
+        
         private CommandViewModel _uploadOnServerCommand;
         public CommandViewModel UploadOnServerCommand
         {
@@ -238,7 +271,7 @@ namespace UpdateCreator.ViewModels
             {
                 return this._uploadOnServerCommand
                   ?? (this._uploadOnServerCommand = new CommandViewModel("Upload on server", new RelayCommand(this.UploadOnServer,
-                      p => !string.IsNullOrEmpty(this.UploadPath))));
+                      p => !string.IsNullOrEmpty(this.UploadPath) && this.IsEnabled)));
             }
         }
 
@@ -248,12 +281,11 @@ namespace UpdateCreator.ViewModels
             get
             {
                 return this._closeCommand
-                  ?? (this._closeCommand = new CommandViewModel("Close", new RelayCommand(this.Close)));
+                  ?? (this._closeCommand = new CommandViewModel("Close", new RelayCommand(this.Close, o => this.IsEnabled)));
             }
         }
 
         private CommandViewModel _updateFilelistCommand;
-        private string _fileNameArchive;
 
         public CommandViewModel UpdateFilelistCommand
         {
@@ -268,9 +300,17 @@ namespace UpdateCreator.ViewModels
 
         private void CreateUpdatePackage(object parameter)
         {
-            var packageBuilder = new PackageBuilderIonic(this._package);
-            //this.IsCreating = true;
-            packageBuilder.Create();
+            this.UpdatePackageCommand = this._abortUpdatePackageCommand;
+            this.IsEnabled = false;
+            this._packageBuilder = new PackageBuilder(this._package);
+            this._packageBuilder.Create();
+        }
+
+        private void AbortUpdatePackage(object obj)
+        {
+            this._packageBuilder.Cancel();
+            this.IsEnabled = true;
+            this.UpdatePackageCommand = this._createUpdatePackageCommand;
         }
 
         private void UploadOnServer(object obj)
