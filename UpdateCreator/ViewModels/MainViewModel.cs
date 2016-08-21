@@ -20,7 +20,7 @@ namespace UpdateCreator.ViewModels
         public MainViewModel()
         {
             this._createUpdatePackageCommand = new CommandViewModel("Create update package", new RelayCommand(this.CreateUpdatePackage, p => this.IsPackageValid));
-            this._abortUpdatePackageCommand = new CommandViewModel("Abort update package", new RelayCommand(this.AbortUpdatePackage));
+            this._abortUpdatePackageCommand = new CommandViewModel("Cancel...", new RelayCommand(this.AbortUpdatePackage));
             this.UpdatePackageCommand = this._createUpdatePackageCommand;
 
             FileProvider.Default.FilelistChangedHandler += (sender, args) =>
@@ -81,6 +81,8 @@ namespace UpdateCreator.ViewModels
                 this.ProgressValue = 0;
                 this.ProgressFileName = string.Empty;
             }
+            this.IsEnabled = true;
+            this.UpdatePackageCommand = this._createUpdatePackageCommand;
             FileProvider.Default.Update();
         }
 
@@ -306,11 +308,16 @@ namespace UpdateCreator.ViewModels
             this._packageBuilder.Create();
         }
 
+        private bool _isPaused;
         private void AbortUpdatePackage(object obj)
         {
-            this._packageBuilder.Cancel();
-            this.IsEnabled = true;
-            this.UpdatePackageCommand = this._createUpdatePackageCommand;
+            this._packageBuilder.IsPause = true;
+            var messageBoxResult = MessageBox.Show("Cancel update created?", "Update canceled", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (messageBoxResult == MessageBoxResult.Yes)
+            {
+                this._packageBuilder.Cancel();
+            }
+            this._packageBuilder.IsPause = false;
         }
 
         private void UploadOnServer(object obj)
