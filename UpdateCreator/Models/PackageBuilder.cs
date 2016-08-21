@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -19,6 +20,9 @@ namespace UpdateCreator.Models
         protected readonly IProgress<ProgressEventArgs> Progress;
         protected int Percentage;
         protected string CurrentFileName = string.Empty;
+        protected readonly PauseTokenSource PauseTokenSource;
+        protected static readonly ManualResetEvent ManualResetEvent = new ManualResetEvent(true);
+
 
         protected Package Package { get; }
         protected IEnumerable<string> FileList { get; } = FileProvider.Default.GetFileList().Where(f => f.IsSelected).Select(f => f.Filename);
@@ -27,6 +31,7 @@ namespace UpdateCreator.Models
         {
             this.Package = package;
             this.CancellationTokenSource = new CancellationTokenSource();
+            this.PauseTokenSource = new PauseTokenSource();
             this.Progress = new Progress<ProgressEventArgs>();
             ((Progress<ProgressEventArgs>) this.Progress).ProgressChanged += PackProgressChanged;
         }
@@ -47,10 +52,44 @@ namespace UpdateCreator.Models
             this.CancellationTokenSource?.Cancel();
         }
 
+        public bool IsPause
+        {
+            get { return !ManualResetEvent.WaitOne(0); }
+            set
+            {
+                if (value)
+                {
+                    ManualResetEvent.Reset();
+                }
+                else
+                {
+                    ManualResetEvent.Set();
+                }
+            }
+        }
+
+        public void Pause()
+        {
+
+            ManualResetEvent.Reset();
+            //this.PauseTokenSource.IsPaused = true;
+            //_isPause = true;
+            //SomeMethodAsync(this.PauseTokenSource.Token).Wait();
+        }
+        public void Resume()
+        {
+            ManualResetEvent.Set();
+            //this.PauseTokenSource.IsPaused = false;
+            //_isPause = false;
+            //SomeMethodAsync(this.PauseTokenSource.Token).Wait();
+        }
+
         private async void OnCreatePackage()
         {
             try
             {
+                //await CreatePackageFileZip();
+
                 await Task.Run(() =>
                 {
                     this.CreatePackageFileZip();
@@ -68,7 +107,6 @@ namespace UpdateCreator.Models
                 PackCompleted(this, new ProgressEventArgs(this.CurrentFileName, this.Percentage, ProgressStatus.Error, ex.Message));
                 return;
             }
-
             this.CurrentFileName = string.Empty;
             this.Package.Hash = this.GetPackageZipHash();
             this.CreatePackageFileXml();
@@ -96,6 +134,7 @@ namespace UpdateCreator.Models
                 foreach (var fileName in this.FileList)
                 {
                     this.CurrentFileName = fileName;
+                    ManualResetEvent.WaitOne();
                     this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
                     archive.CreateEntryFromFile(this.CurrentFileName, this.CurrentFileName, CompressionLevel.Optimal);
                     this.Percentage = (int)Math.Round((double)++count / this.FileList.Count() * 100.0, 0);
@@ -104,6 +143,30 @@ namespace UpdateCreator.Models
                 }
             }
         }
+
+        private Task myPause()
+        {
+            return Task.Delay(100);
+        }
+
+        //private async void myPause()
+        //{
+        //    while (this._isPause)
+        //    {
+        //        await Task.Delay(100);
+        //    }
+        //}
+
+        public static async Task SomeMethodAsync(PauseToken pause)
+        {
+            for (var i = 0; i < 100; i++)
+            {
+                Debug.WriteLine(i);
+                await Task.Delay(100);
+                await pause.WaitWhilePausedAsync();
+            }
+        }
+
 
         private void CreatePackageFileXml()
         {

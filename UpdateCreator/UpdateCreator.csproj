@@ -107,6 +107,7 @@
     <Compile Include="Models\PackageBuilderIonic.cs" />
     <Compile Include="Models\Package.cs" />
     <Compile Include="Models\PackageBuilder.cs" />
+    <Compile Include="Models\PauseToken.cs" />
     <Compile Include="Models\ProgressEventArgs.cs" />
     <Compile Include="Models\PackageNameEventArgs.cs" />
     <Compile Include="Models\SelectedFileEventArgs.cs" />

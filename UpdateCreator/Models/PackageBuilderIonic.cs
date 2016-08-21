@@ -19,7 +19,6 @@ namespace UpdateCreator.Models
             {
                 // add content to zip here 
                 zipFile.AddFiles(this.FileList);
-
                 zipFile.SaveProgress +=
                     (o, args) =>
                     {
