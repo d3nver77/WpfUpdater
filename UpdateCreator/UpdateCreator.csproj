@@ -71,10 +71,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
-      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.IO.Compression" />
@@ -104,7 +100,6 @@
     <Compile Include="Models\FileProvider.cs" />
     <Compile Include="Models\IDragable.cs" />
     <Compile Include="Models\IFileProperties.cs" />
-    <Compile Include="Models\PackageBuilderIonic.cs" />
     <Compile Include="Models\Package.cs" />
     <Compile Include="Models\PackageBuilder.cs" />
     <Compile Include="Models\ProgressEventArgs.cs" />
