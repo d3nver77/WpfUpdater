@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Windows;
 using System.Windows.Input;
 using UpdateCreator.Models;
@@ -146,7 +147,7 @@ namespace UpdateCreator.ViewModels
             get { return this._progressValue; }
             set
             {
-                if (this._progressValue != value)
+                if (Math.Abs(this._progressValue - value) > double.Epsilon)
                 {
                     this._progressValue = value;
                     this.OnPropertyChanged();
@@ -308,6 +309,8 @@ namespace UpdateCreator.ViewModels
 
         #endregion Commands
 
+        #region Methods
+
         private void CreateUpdatePackage(object parameter)
         {
             this.UpdatePackageCommand = this._abortUpdatePackageCommand;
@@ -329,7 +332,8 @@ namespace UpdateCreator.ViewModels
 
         private void UploadOnServer(object obj)
         {
-            throw new NotImplementedException();
+            var uploader = new Uploader(this.UploadPath);
+            uploader.UploadFiles(this._package.PackageFilenameZip, this._package.PackageFilenameXml);
         }
 
         private void Close(object obj)
@@ -341,5 +345,7 @@ namespace UpdateCreator.ViewModels
         {
             FileProvider.Default.Update();
         }
+
+        #endregion Methods
     }
 }

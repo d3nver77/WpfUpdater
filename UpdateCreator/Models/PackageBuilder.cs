@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -78,7 +76,7 @@ namespace UpdateCreator.Models
             catch (OperationCanceledException ex)
             {
                 this.RemovePackageFiles();
-                PackCompleted(this, new ProgressEventArgs(this.CurrentFileName, this.Percentage, ProgressStatus.Canceled));
+                PackCompleted(this, new ProgressEventArgs(this.CurrentFileName, this.Percentage, ProgressStatus.Canceled, ex.Message));
                 return;
             }
             catch (Exception ex)
