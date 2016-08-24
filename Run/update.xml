@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Update Product="SomeAppWithUpdate">
-  <Description>1. fix bugs
-2. some features</Description>
+  <Description />
   <LaunchFile>SomeAppWithUpdate.exe</LaunchFile>
   <LaunchArguments />
   <Version>1.2.3.4</Version>
-  <Url>http://www.alleasy.com/updates\update.zip</Url>
+  <Url>/update.zip</Url>
   <Hash>f3a3ff1d86503f19df6aeecfa7d23417</Hash>
 </Update>
