@@ -46,16 +46,20 @@ namespace UpdateCreator.Models
             this.Path = groups["path"].Value;
         }
 
+        //todo change method to upload ftp(s), htpp(s) and maybe sftp (ssh)
         public void UploadFiles(params string[] files)
         {
+            var method = this.Protocol == "ftp" ? "STOR" : "POST";
             using (WebClient client = new WebClient())
             {
-                client.Credentials = new NetworkCredential(this.Username, this.Password);
+                //client.Credentials = new NetworkCredential(this.Username, this.Password);
                 
                 foreach (var file in files)
                 {
-                    var ftppath = string.Format("{0}://{1}{2}/{3}", this.Protocol, string.Join(":", this.Host, this.Port), this.Path, file);
-                    client.UploadFile(ftppath, "STOR", file);
+                    var host = this.Host + (string.IsNullOrEmpty(this.Port) ? string.Empty : ":" + this.Port);
+                    var path = string.Format("{0}://{1}{2}", this.Protocol, host, this.Path);
+                    //path = string.Format("http://www.alleasy.com/Upload/Upload");
+                    client.UploadFile(path, file);
                 }
                 
             }

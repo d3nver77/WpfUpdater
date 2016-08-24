@@ -225,7 +225,7 @@ namespace UpdateCreator.ViewModels
 
         public string Url
         {
-            get { return this._package.Url; }
+            get { return Path.GetDirectoryName(this._package.Url); }
             set
             {
                 if (this._package.Url != value)

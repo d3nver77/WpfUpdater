@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Xml.Serialization;
 
 namespace UpdateCreator.Models
@@ -10,6 +11,7 @@ namespace UpdateCreator.Models
         public event EventHandler<PackageNameEventArgs> PackageNameChanged = (sender, args) => { };
 
         private string _packageName;
+        private string _url = string.Empty;
 
         [XmlIgnore]
         public string PackageName
@@ -28,7 +30,13 @@ namespace UpdateCreator.Models
         public string LaunchFile { get; set; } = string.Empty;
         public string LaunchArguments { get; set; } = string.Empty;
         public string Version { get; set; } = string.Empty;
-        public string Url { get; set; } = string.Empty;
+
+        public string Url
+        {
+            get { return this._url; }
+            set { this._url = Path.Combine(value, this.PackageFilenameZip); }
+        }
+
         public string Hash { get; set; } = string.Empty;
 
         public string PackageFilenameZip => string.IsNullOrEmpty(this.PackageName) ? string.Empty : string.Format("{0}.zip", this.PackageName);
